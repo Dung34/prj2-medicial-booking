@@ -10,9 +10,9 @@ router.post('/register', registerPatient)
 
 router.get('/', verifyToken, getAllPatients)
 
-router.get('/:id', getPatientById)
+router.get('/:id', verifyToken, getPatientById)
 
-router.put('/:id', updatePatientById)
+router.put('/:id', verifyToken, updatePatientById)
 
-router.delete('/:id', deletePatientById)
+router.delete('/:id', verifyToken, deletePatientById)
 module.exports = router
