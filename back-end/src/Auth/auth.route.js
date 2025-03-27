@@ -12,7 +12,8 @@ router.post('/', async (req, res) => {
         if (patient.password === password) {
             // generate token
             const token = jwt.sign({ email: patient.email, role: 'patient' }, 'secret')
-            res.status(200).send({ "token": token, "role": "patient" })
+            res.status(200).send({ "token": token, "role": "patient", "id": patient._id })
+            console.log("Patient logged in successfully")
         }
         else {
             res.status(401).send({ "message": "Wrong password" })

@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 const LoginPage = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -14,13 +16,14 @@ const LoginPage = () => {
                 email,
                 password
             });
-            console.log(response.data.token);
+            console.log("id: ", response.data.id);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('patient_id', response.data.id);
+            navigate('/');
         } catch (error) {
             console.error('Error:', error);
             setError('Invalid email or password');
         }
-        console.log('Email:', email);
-        console.log('Password:', password);
     };
 
     return (
