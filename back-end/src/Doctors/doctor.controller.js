@@ -14,7 +14,8 @@ const registerDoctor = async (req, res) => {
 
 const getAllDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.find()
+        const { page } = req.query
+        const doctors = await Doctor.find().limit(10).skip((page - 1) * 10)
         res.status(200).send(doctors)
     } catch (error) {
         console.log(error)

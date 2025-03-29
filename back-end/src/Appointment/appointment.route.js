@@ -11,7 +11,7 @@ const { registerAppointment,
 
 const router = express.Router()
 
-router.post('register', registerAppointment)
+router.post('/register', registerAppointment)
 
 router.get('/', getAllAppointments)
 

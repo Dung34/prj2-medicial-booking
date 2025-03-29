@@ -6,12 +6,18 @@ import App from './App.jsx'
 import HomePage from './pages/HomePage/HomePage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage/RegisterPage.jsx'
+import ListDoctor from './component/ListDoctor/ListDoctor.jsx'
+import Appointment from './pages/AppointmentPage/Appointment.jsx'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <HomePage />,
     errorElement: <div>404 Not Found</div>,
+  },
+  {
+    path: '/doctors/:speciality_name',
+    element: <ListDoctor />,
   },
   {
     path: '/login',
@@ -20,6 +26,9 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  }, {
+    path: '/appointment/:doctor_id',
+    element: <Appointment />
   }
 ])
 

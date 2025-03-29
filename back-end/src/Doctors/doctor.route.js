@@ -1,12 +1,13 @@
 const express = require('express')
 // const Doctor = require('./doctor.model')
 const { registerDoctor, getAllDoctors, getDoctorById, updateDoctorById, deleteDoctorById } = require('./doctor.controller')
+const verifyToken = require('../Auth/verifyToken')
 
 const router = express.Router()
 
 router.post('/register', registerDoctor)
 
-router.get('/', getAllDoctors)
+router.get('/', verifyToken, getAllDoctors)
 
 router.get('/:id', getDoctorById)
 

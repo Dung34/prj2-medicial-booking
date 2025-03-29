@@ -1,6 +1,7 @@
 const Speciality = require('./speciality.model')
-const Speciality_Doctor = require('./speciality-doctor.model')
+
 const Doctor = require('../Doctors/doctor.model')
+const Speciality_Doctor = require('./speciality-doctor.model')
 
 const createSpeciality = async (req, res) => {
     try {
@@ -16,8 +17,9 @@ const createSpeciality = async (req, res) => {
 
 const addSpecialityToDoctor = async (req, res) => {
     try {
-        const { doctorId, specialityId } = req.body
+        const { doctorId, specialityId, speciality_name } = req.body
         const doctor = await Doctor.findById(doctorId)
+
         if (!doctor) {
             res.status(404).send({ "message": "Doctor not found" })
         } else {
@@ -26,8 +28,8 @@ const addSpecialityToDoctor = async (req, res) => {
                 res.status(404).send({ "message": "Speciality not found" })
             }
             else {
-                const Speciality_Doctor = await Speciality_Doctor({ doctor_id: doctorId, speciality_id: specialityId })
-                await Speciality_Doctor.save()
+                const speciality_Doctor = await Speciality_Doctor({ ...req.body })
+                await speciality_Doctor.save()
                 res.status(200).send({ "message": "Speciality added to doctor successfully", "data": Speciality_Doctor })
             }
         }
@@ -97,15 +99,18 @@ const searchSpecialitybyDoctorId = async (req, res) => {
     }
 }
 
-const searchDoctorbySpecialityId = async (req, res) => {
+const getDocBySpecialityName = async (req, res) => {
     try {
-        const { speciality_id } = req.params
-        const specialities_doctor = await Speciality_Doctor.find({ speciality_id })
+        const { speciality_name } = req.params
+        const specialities_doctor = await Speciality_Doctor.find({ speciality_name })
+
         if (specialities_doctor.length === 0) {
             res.status(404).send({ "message": "Speciality don't have any doctor" })
         }
         else {
-            res.status(200).send(specialities_doctor)
+            const doctorIds = specialities_doctor.map(doc => doc.doctorId)
+            const doctors = await Doctor.find({ _id: { $in: doctorIds } })
+            res.status(200).send(doctors)
         }
     } catch (error) {
         console.log(error)
@@ -119,5 +124,5 @@ module.exports = {
     deleteSpecialitybyID,
     searchSpecialitybyId,
     searchSpecialitybyDoctorId,
-    searchDoctorbySpecialityId
+    getDocBySpecialityName,
 }

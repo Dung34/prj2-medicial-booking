@@ -2,16 +2,20 @@ const mongoose = require('mongoose')
 
 const speciality_doctorSchema = new mongoose.Schema(
     {
-        doctor_id: {
+        doctorId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Doctor',
             required: true
         },
-        speciality_id: {
+        specialityId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Speciality',
             required: true
-        }
+        },
+        speciality_name: {
+            type: String,
+            required: true
+        },
     }
 )
 

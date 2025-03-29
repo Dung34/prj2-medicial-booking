@@ -4,7 +4,7 @@ const registerAppointment = async (req, res) => {
     try {
         const newAppointment = await Appointment({ ...req.body })
         await newAppointment.save()
-        res.status(200).send({ "message": "Appointment registered successfully", "data": newAppointment })
+        res.status(200).send(newAppointment)
     } catch (error) {
         console.log(error)
         res.status(500).send({ "message": "Internal server error", "error": error })
