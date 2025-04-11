@@ -2,7 +2,7 @@ const Patient = require('./patient.model')
 
 const registerPatient = async (req, res) => {
     try {
-        const { fullname, phoneNumber, email, password, address, dateOfBirth, gender, identificationNumber, bloodType } = req.body
+        const { fullname, phoneNumber, email, password, address, dateOfBirth, gender, identificationNumber, bloodType, note } = req.body
 
         const existPatient = await Patient.findOne({
             $or: [
@@ -13,20 +13,20 @@ const registerPatient = async (req, res) => {
         })
         if (existPatient) {
             if (existPatient.phoneNumber === phoneNumber) {
-                return res.status(400).send({ "message": "Phone number already exists" })
+                return res.status(400).send({ "message": "Số điện thoại đã tồn tại" })
             }
             if (existPatient.email === email) {
-                return res.status(400).send({ "message": "Email already exists" })
+                return res.status(400).send({ "message": "Email đã tồn tại" })
             }
             if (existPatient.identificationNumber === identificationNumber) {
-                return res.status(400).send({ "message": "Identification number already exists" })
+                return res.status(400).send({ "message": "Số CCCD đã tồn tại" })
             }
         } else {
             const newPatient = await Patient({ ...req.body })
             await newPatient.save()
-            res.status(200).send({ "message": "Patient registered successfully", "data": newPatient })
+            res.status(200).send({ "message": "Đăng ký bệnh nhân thành công", "data": newPatient })
             // console.log("Patient registered successfully" + newPatient)
-            console.log("Patient registered successfully")
+            console.log("Đăng ký bệnh nhân thành công")
         }
 
         // const newPatient = await Patient({ ...req.body })

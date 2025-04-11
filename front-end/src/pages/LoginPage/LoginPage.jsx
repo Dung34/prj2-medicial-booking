@@ -7,6 +7,7 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [showNotification, setShowNotification] = useState(false)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -19,15 +20,30 @@ const LoginPage = () => {
             console.log("id: ", response.data.id);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('patient_id', response.data.id);
-            navigate('/');
+            setError("Đăng nhập thành công")
+            setShowNotification(true)
+
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
         } catch (error) {
             console.error('Error:', error);
-            setError('Invalid email or password');
+            setError('Đăng nhập thất bại');
+            setShowNotification(true)
+            setTimeout(() => {
+                setShowNotification(false)
+            }, 3000)
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 relative">
+            {showNotification && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-gray-300 p-8 rounded-lg z-20 bg-amber-50">
+                    <h2 className="text-2xl font-semibold mb-4">Thông báo</h2>
+                    <p>{error}</p>
+                </div>
+            )}
             <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
                 <form onSubmit={handleSubmit}>

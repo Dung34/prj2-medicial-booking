@@ -2,12 +2,18 @@ const Doctor = require("./doctor.model")
 
 const registerDoctor = async (req, res) => {
     try {
-        const newBook = await Doctor({ ...req.body })
-        await newBook.save()
-        res.status(200).send({ "message": "Doctor registered successfully", "data": newBook })
+
+
+        const newDoctor = await Doctor({ ...req.body })
+
+        await newDoctor.save()
+        res.status(200).send({ "message": "Doctor registered successfully", "data": newDoctor })
     } catch (error) {
         console.log(error)
-        res.status(500).send({ "meassage": "Internal server error", "error": error })
+        // if (error.code === 11000) {
+        //     return res.status(400).send({ "message": "Email hoặc số điện thoại đã tồn tại", "error": error.code })
+        // }
+        res.status(500).send({ "meassage": "Đăng ký bác sĩ thất bại", "error": error.code })
     }
 }
 //get all doctors
