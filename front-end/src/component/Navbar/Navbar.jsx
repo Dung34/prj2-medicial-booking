@@ -1,6 +1,28 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import logo from '../../assets/Icons/medicine.png'
+import { Link } from 'react-router-dom'
+
 const Navbar = () => {
+    const [isLogin, setLogin] = useState(false)
+
+    const handleLogout = () => {
+        localStorage.removeItem('token')
+        setLogin(false)
+    }
+    useEffect(() => {
+        const handleLogin = async () => {
+            const token = localStorage.getItem('token')
+
+            if (token) {
+                setLogin(true)
+            }
+            if (!token) {
+                setLogin(false)
+            }
+        }
+        handleLogin()
+    }, [])
+
     return (
         <header className=''>
             {/* Emergency Call Section */}
@@ -25,35 +47,61 @@ const Navbar = () => {
 
                 {/* Navigation Links */}
                 <nav className="flex items-center space-x-4">
-                    <a href="#" className="text-gray-700 hover:text-blue-500">
-                        <span className='transition-all border-b-transparent hover:border-b-[#ffba00]'>
-                            Home
-                        </span>
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">About Us</a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">Services</a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">FAQ's</a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">Blog</a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">Shop</a>
-                    <a href="#" className="text-gray-700 hover:text-blue-500">Contact Us</a>
-                    <a
-                        href="#"
-                        className="bg-blue-800 text-white px-4 py-2 rounded-full flex items-center space-x-2"
-                    >
-                        <span>Book Appointment</span>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
+                    <Link to="/" className="text-gray-700 hover:text-blue-500">
+                        <span>Trang chủ</span></Link>
+                    <Link to="/" className="text-gray-700 hover:text-blue-500">
+                        <span>Về chúng tôi</span>
+                    </Link>
+                    <Link to="/" className="text-gray-700 hover:text-blue-500">
+                        <span>Dịch vụ</span>
+                    </Link>
+                    <Link to="/" className="text-gray-700 hover:text-blue-500">
+                        <span>Blog</span>
+                    </Link>
+                    <Link to="/" className="text-gray-700 hover:text-blue-500">
+                        <span>Liên hệ</span>
+                    </Link>
+                    {!isLogin ? (
+                        <Link
+                            to="/login"
+                            className="bg-blue-800 text-white px-4 py-2 rounded-full flex items-center space-x-2"
                         >
-                            <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </a>
+                            <span>Đăng nhập</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </Link>
+                    ) : (
+                        <Link
+                            to="/"
+                            onClick={handleLogout}
+                            className="bg-red-800 text-white px-4 py-2 rounded-full flex items-center space-x-2"
+                        >
+                            <span>Đăng xuất</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </Link>
+                    )}
+
                 </nav>
             </div>
         </header>

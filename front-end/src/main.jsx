@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage/RegisterPage.jsx'
 import Appointment from './pages/AppointmentPage/Appointment.jsx'
 import DoctorSelection from './pages/DoctorrSelection/DoctorSelection.jsx'
 
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+
     <RouterProvider router={router} />
   </React.StrictMode>
 )

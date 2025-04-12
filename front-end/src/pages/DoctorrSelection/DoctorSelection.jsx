@@ -2,7 +2,7 @@ import React from 'react'
 import { Search } from "lucide-react"
 // import DoctorList from "@/components/doctor-list"
 // import SearchFilters from "@/components/search-filters"
-import DoctorList from '../../component/DoctorList/DoctorList'
+// import DoctorList from '../../component/DoctorList/DoctorList'
 import SearchFilters from '../../component/SearchFilters/SearchFilters'
 const DoctorSelection = () => {
     return (
@@ -29,7 +29,7 @@ const DoctorSelection = () => {
                     </aside>
 
                     <div className="space-y-6">
-                        <DoctorList />
+                        {/* <DoctorList /> */}
                     </div>
                 </div>
             </main>

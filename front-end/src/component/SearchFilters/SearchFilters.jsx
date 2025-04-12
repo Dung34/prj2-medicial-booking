@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Check, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+
 
 const specialties = [
     "Cardiology",
