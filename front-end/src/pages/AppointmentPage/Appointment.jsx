@@ -1,37 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const Appointment = () => {
     const navigate = useNavigate();
     const { doctor_id } = useParams();
     const [doctor, setDoctor] = useState({});
-    const [patient, setPatient] = useState({});
-    const [note, setNote] = useState('');
-    const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
+    // const [patient, setPatient] = useState({});
+    // const [note, setNote] = useState('');
+    // const [date, setDate] = useState('');
+    // const [time, setTime] = useState('');
     const [registerSuccess, setRegisterSuccess] = useState(false);
-    const [error, setError] = useState(null);
-    const patient_id = localStorage.getItem('patient_id');
+    // const [error, setError] = useState(null);
+    const patient_id = localStorage.getItem('id');
     const headers = {
         Authorization: `${localStorage.getItem('token')}`,
     };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (doctor_id) => {
             try {
+
                 const doctorRes = await axios.get(`http://localhost:3000/api/doctor/${doctor_id}`, { headers: headers });
+                if (doctorRes.status !== 200) {
+                    throw new Error('Xảy ra lỗi khi tải dữ liệu bác sĩ !!');
+
+                }
                 setDoctor(doctorRes.data);
-                const patientRes = await axios.get(`http://localhost:3000/api/patient/${patient_id}`, { headers: headers });
-                setPatient(patientRes.data);
-                console.log(doctorRes.data, patientRes.data)
+                console.log(doctorRes.data);
+
             } catch (err) {
                 console.error('Error fetching data:', err);
-                setError('Failed to load data.');
+                setError('Xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau !!!');
             }
         };
-        fetchData();
-    }, [doctor_id, patient_id]);
+        fetchData(doctor_id);
+    }, [doctor_id]);
 
     const registerAppointment = async (e) => {
         e.preventDefault(); // Prevent default form submission
@@ -46,6 +50,11 @@ const Appointment = () => {
             if (appointment.status === 200) {
                 setRegisterSuccess(true);
                 setTimeout(() => {
+                    setDate('');
+                    setTime('');
+                    setNote('');
+                    setDoctor({});
+                    setRegisterSuccess(false);
                     navigate('/');
                 }, 3000);
             }
@@ -55,40 +64,95 @@ const Appointment = () => {
         }
     };
 
-    if (error) {
-        return <div className="text-red-500">Error: {error}</div>;
-    }
+    // if (error) {
+    //     return <div className="text-red-500">Error: {error}</div>;
+    // }
 
+    const [note, setNote] = useState("");
+    const location = useLocation()
+    const [date, setDate] = useState(location.state.date || "12/4/2025")
+    const [time, setTime] = useState(location.state.time || "10:30 - 11:30")
     return (
-        <div className='relative'>
+        <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-lg space-y-6">
+            {/* Doctor Info */}
+            <div className="flex items-start space-x-4">
+                <img
+                    src="/doctor.jpg"
+                    alt="Doctor"
+                    className="w-20 h-20 rounded-full object-cover"
+                />
+                <div>
+                    <h3 className="text-sm text-gray-500 font-semibold uppercase">ĐẶT LỊCH KHÁM</h3>
+                    <h2 className="text-blue-900 font-bold text-lg">Bác sĩ {doctor.fullname}</h2>
+                    <p className="text-yellow-600 font-semibold mt-1">{time} ngày {date}</p>
+                    <p className="text-gray-600 mt-1">
+                        📍 Phòng khám Spinetech Clinic, 257 Giải Phóng, Đống Đa, Hà Nội
+                    </p>
+                </div>
+            </div>
+
+            {/* Lý do khám */}
+            <div>
+                <label className="block font-semibold text-gray-700 mb-1">Lý do khám</label>
+                <textarea
+                    rows="3"
+                    className="w-full border rounded p-2 text-sm"
+                    placeholder="Nhập lý do khám..."
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                />
+            </div>
+
+            {/* Phương thức thanh toán */}
+            <div>
+                <p className="text-blue-700 font-semibold mb-2">Hình thức thanh toán</p>
+                <label className="flex items-center space-x-2 text-sm">
+                    <input type="radio" checked readOnly className="form-radio" />
+                    <span>Thanh toán sau tại cơ sở y tế</span>
+                </label>
+            </div>
+
+            {/* Bảng giá */}
+            <div className="bg-gray-100 p-4 rounded text-sm">
+                <div className="flex justify-between mb-1">
+                    <span>Giá khám</span>
+                    <span>500.000đ</span>
+                </div>
+                <div className="flex justify-between mb-1">
+                    <span>Phí đặt lịch</span>
+                    <span className="text-green-600">Miễn phí</span>
+                </div>
+                <div className="flex justify-between font-semibold border-t pt-2 mt-2">
+                    <span>Tổng cộng</span>
+                    <span className="text-red-600">500.000đ</span>
+                </div>
+            </div>
+
+            {/* Lưu ý */}
+            <div className="bg-blue-100 p-4 rounded text-sm text-gray-700">
+                <strong className="block mb-1">LƯU Ý</strong>
+                <ul className="list-disc list-inside space-y-1">
+
+                    <li>Điền đầy đủ, đúng và vui lòng kiểm tra lại thông tin trước khi ấn "Xác nhận"</li>
+                </ul>
+            </div>
+
+            {/* Nút xác nhận */}
+            <button onClick={registerAppointment}
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 rounded">
+                Xác nhận đặt khám
+            </button>
             {registerSuccess && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-gray-300 p-8 rounded-lg z-20 bg-amber-50">
-                    <h2 className="text-2xl font-semibold mb-4">Thông báo</h2>
-                    <p>Đăng ký thành công</p>
+                <div className="bg-green-100 text-green-700 p-4 rounded">
+                    <p className="font-semibold">Đặt lịch khám thành công!</p>
+                    <p>Chúng tôi sẽ liên hệ với bạn để xác nhận lịch khám.</p>
                 </div>
             )}
-            <h1 className='text-center text-3xl font-bold'>Lịch hẹn</h1>
-            <form onSubmit={registerAppointment}>
-                <div className='flex flex-col justify-center items-center'>
-                    <div className='m-4 p-4 border rounded shadow-lg'>
-                        <p>Đăng ký lịch khám</p>
-                        <p>Bác sĩ khám : {doctor.fullname}</p>
-                        <p>SĐT : {doctor.phoneNumber}</p>
-                    </div>
-                    <div className='m-4 p-4 border rounded shadow-lg w-[50vw] gap-2 flex flex-col'>
-                        <h2 className='text-xl font-bold'>Bệnh nhân</h2>
-                        <p>{patient.fullname}</p>
-                        <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder='Lí do khám bệnh' className='mt-1 p-2 w-full border rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-500' />
-                        <p>Ngày khám</p>
-                        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className='border rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-500 mt-1 p-2 w-fit' />
-                        <p>Giờ khám</p>
-                        <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className='border rounded-md shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-500 mt-1 p-2 w-fit' />
-                        <div className='flex justify-center items-center'>
-                            <button type="submit" className='bg-blue-500 text-white p-2 rounded'>Đăng ký</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            {/* Điều khoản sử dụng */}
+            <p className="text-center text-xs text-gray-500 mt-2">
+                Bằng việc xác nhận đặt khám, bạn đã hoàn toàn đồng ý với{" "}
+                <a href="#" className="text-blue-500 underline">Điều khoản sử dụng</a> dịch vụ của chúng tôi.
+            </p>
         </div>
     );
 };

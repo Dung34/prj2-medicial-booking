@@ -42,7 +42,7 @@ const patientSchema = new mongoose.Schema(
 
         },
         note: {
-            type: String,
+            type: [String],
         },
         status: {
             type: String,

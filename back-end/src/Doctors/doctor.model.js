@@ -35,7 +35,7 @@ const doctorSchema = new mongoose.Schema(
         availableTime: {
             type: [String],
             required: true,
-            default: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"],
+            default: ["9:30 - 10:30", "10:30 - 11:30", "1:30 - 2:30", "2:30 - 3:30", "3:30 - 4:30"],
         },
         status: {
             type: String,

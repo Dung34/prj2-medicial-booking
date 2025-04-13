@@ -40,7 +40,9 @@ const SelectSpeciality = () => {
     return (
         <div className='flex flex-row justify-around'>
             {specialities.map((speciality) => (
-                <div key={speciality._id} className="flex flex-col items-center size-20" onClick={() => handleClick(speciality.speciality_name)}>
+                <div key={speciality._id}
+                    className="flex flex-col items-center size-20"
+                    onClick={() => handleClick(speciality.speciality_name)}>
                     <img src={`/Speciality/${speciality.speciality_name}.png`} alt={speciality.speciality_name} />
                     <p>{speciality.speciality_name}</p>
                     {/* <button onClick={() => handleClick(speciality.id)}>{speciality.name}</button> */}

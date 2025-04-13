@@ -18,7 +18,7 @@ const createSpeciality = async (req, res) => {
 const addSpecialityToDoctor = async (req, res) => {
     try {
         const { doctorId, specialityId, speciality_name } = req.body
-        const doctor = await Doctor.findById(doctorId)
+        const doctor = await Doctor.find({ "doctorId": doctorId })
 
         if (!doctor) {
             res.status(404).send({ "message": "Doctor not found" })
@@ -28,9 +28,18 @@ const addSpecialityToDoctor = async (req, res) => {
                 res.status(404).send({ "message": "Speciality not found" })
             }
             else {
-                const speciality_Doctor = await Speciality_Doctor({ ...req.body })
-                await speciality_Doctor.save()
-                res.status(200).send({ "message": "Speciality added to doctor successfully", "data": Speciality_Doctor })
+                const speciality_Doctor = await Speciality_Doctor.findOne({ doctorId, specialityId })
+                if (speciality_Doctor) {
+                    res.status(400).send({ "message": "Chuyên khoa này đã có bác sĩ này rồi !" })
+                }
+                else {
+                    const speciality_Doctor = await Speciality_Doctor({ ...req.body })
+                    await speciality_Doctor.save()
+                    res.status(200).send({ "message": `Bác sĩ được chuyển vào chuyển vào khoa ${speciality_name} thành công !`, "data": speciality_Doctor })
+                }
+                // const speciality_Doctor = await Speciality_Doctor({ ...req.body })
+                // await speciality_Doctor.save()
+
             }
         }
 
