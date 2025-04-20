@@ -1,6 +1,7 @@
 const Appointment = require("./appointment.model")
 const Doctor = require("../Doctors/doctor.model")
 const Patient = require("../Patients/patient.model")
+const Counter = require("../Counter/Counter.model")
 const registerAppointment = async (req, res) => {
     try {
         const newAppointment = await Appointment({ ...req.body })
@@ -13,60 +14,70 @@ const registerAppointment = async (req, res) => {
 }
 
 const getAllAppointments = async (req, res) => {
-    // try {
-    //     const appointments = await Appointment.find()
-
-    //     if (!appointments) {
-    //         res.status(404).send({ "message": "Không tìm thấy lịch hẹn nào" })
-    //     } else {
-    //         // let pendingAppoint = []
-    //         // let confirmAppoint = []
-    //         // let cancelledAppoint = []
-    //         // for (const appointment of appointments) {
-    //         //     // Perform any necessary operations on each appointment
-    //         //     if (appointment.status === "pending") {
-    //         //         pendingAppoint.push(appointment)
-    //         //     } else {
-    //         //         if (appointment.status === "confirm") {
-    //         //             confirmAppoint.push(appointment)
-    //         //         } else {
-    //         //             cancelledAppoint.push(appointment)
-    //         //         }
-    //         //     }
-    //         // }
-    //         // res.status(200).send(
-    //         //     { 'status': pending, 'appointments': pendingAppoint },
-    //         //     { 'status': confirm, 'appointments': confirmAppoint },
-    //         //     { 'status': cancelled, 'appointments': cancelledAppoint }
-    //         // )
-    //         res.status(200).send(appointments)
-    //     }
-
-    // } catch (error) {
-    //     console.log(error)
-    //     res.status(500).send({ "message": error })
-    // }
     try {
-        const appointments = await Appointment.find();
+        const appointments = await Appointment.find()
 
-        const grouped = appointments.reduce((acc, curr) => {
-            const status = curr.status || 'unknown';
+        if (!appointments) {
+            res.status(404).send({ "message": "Không tìm thấy lịch hẹn nào" })
+        } else {
+            // let pendingAppoint = []
+            // let confirmAppoint = []
+            // let cancelledAppoint = []
+            // for (const appointment of appointments) {
+            //     // Perform any necessary operations on each appointment
+            //     if (appointment.status === "pending") {
+            //         pendingAppoint.push(appointment)
+            //     } else {
+            //         if (appointment.status === "confirm") {
+            //             confirmAppoint.push(appointment)
+            //         } else {
+            //             cancelledAppoint.push(appointment)
+            //         }
+            //     }
+            // }
+            // res.status(200).send(
+            //     { 'status': pending, 'appointments': pendingAppoint },
+            //     { 'status': confirm, 'appointments': confirmAppoint },
+            //     { 'status': cancelled, 'appointments': cancelledAppoint }
+            // )
+            res.status(200).send(appointments)
+        }
 
-            // Tìm xem nhóm status đã tồn tại chưa
-            const existingGroup = acc.find((group) => group.status === status);
-
-            if (existingGroup) {
-                existingGroup.appointments.push(curr);
-            } else {
-                acc.push({ status, appointments: [curr] });
-            }
-
-            return acc;
-        }, []);
-
-        res.status(200).json(grouped);
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi lấy danh sách lịch hẹn', error });
+        console.log(error)
+        res.status(500).send({ "message": error })
+    }
+    // try {
+    //     const appointments = await Appointment.find();
+
+    //     const grouped = appointments.reduce((acc, curr) => {
+    //         const status = curr.status || 'unknown';
+
+    //         // Tìm xem nhóm status đã tồn tại chưa
+    //         const existingGroup = acc.find((group) => group.status === status);
+
+    //         if (existingGroup) {
+    //             existingGroup.appointments.push(curr);
+    //         } else {
+    //             acc.push({ status, appointments: [curr] });
+    //         }
+
+    //         return acc;
+    //     }, []);
+
+    //     res.status(200).json(grouped);
+    // } catch (error) {
+    //     res.status(500).json({ message: 'Lỗi khi lấy danh sách lịch hẹn', error });
+    // }
+}
+const countData = async (req, res) => {
+    try {
+        const counter = await Counter.find()
+
+        res.status(200).send(counter)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "message": error })
     }
 }
 
@@ -152,5 +163,6 @@ module.exports = {
     getAppointmentByPatientId,
     getAppointmentByDoctorId,
     updateAppointmentById,
-    deleteAppointmentById
+    deleteAppointmentById,
+    countData,
 }

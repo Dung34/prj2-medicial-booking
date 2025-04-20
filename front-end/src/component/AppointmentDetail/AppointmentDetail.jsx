@@ -99,6 +99,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <div>
                                 <p className="font-semibold">Bệnh nhân</p>
                                 <p>{patient.fullname || 'John Smith'}</p>
+                                <p>SĐT: {patient.phoneNumber}</p>
                             </div>
                         </div>
 
@@ -107,7 +108,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <div>
                                 <p className="font-semibold">Bác sĩ</p>
                                 <p>{doctor.fullname || 'Dr. Sarah Johnson'}</p>
-                                <p className="text-sm text-gray-500">{doctor.email}</p>
+                                <p className="text-sm text-gray-500">Email: {doctor.email}</p>
                             </div>
                         </div>
 
@@ -149,12 +150,12 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <FaNotesMedical className="mt-1" />
                             <div>
                                 <p className="font-semibold">Ghi chú</p>
-                                <p>{appointment.note || 'Patient should bring recent test results and medication list.'}</p>
+                                <p>{appointment.note || 'Bệnh nhân không có ghi chú nào !!!'}</p>
                             </div>
                         </div>
                     </div>
                     {showNotification && notification ? (
-                        <div className='flex items-center justify-center mt-2'><p className='text-red-500'>{notification}</p></div>
+                        <div className='flex items-center justify-center mt-2'><p className='text-green-500'>{notification}</p></div>
                     ) : null}
                     <div className="mt-6 flex justify-end gap-3">
                         <button

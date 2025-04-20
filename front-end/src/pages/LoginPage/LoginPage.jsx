@@ -30,15 +30,28 @@ const LoginPage = () => {
                 email,
                 password
             });
-            console.log("id: ", response.data.id);
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('id', response.data.id);
-            setError("Đăng nhập thành công")
-            setShowNotification(true)
+            if (response.status == 200) {
+                console.log("id: ", response.data.id);
+                localStorage.clear()
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('id', response.data.id);
 
-            setTimeout(() => {
-                navigate('/');
-            }, 3000);
+                setError("Đăng nhập thành công")
+                setShowNotification(true)
+
+                setTimeout(() => {
+                    if (response.data.role === "patient") {
+                        navigate('/')
+                    } else {
+                        if (response.data.role === "doctor") {
+                            navigate('/dashboard/doctor')
+                        } else {
+                            navigate('/dashboard')
+                        }
+                    }
+                }, 3000);
+            }
+
         } catch (error) {
             console.error('Error:', error);
             setError('Không thể đăng nhập, vui lòng kiểm tra lại thông tin tài khoản của bạn!');

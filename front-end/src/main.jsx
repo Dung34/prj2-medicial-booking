@@ -10,6 +10,8 @@ import RegisterPage from './pages/RegisterPage/RegisterPage.jsx'
 import Appointment from './pages/AppointmentPage/Appointment.jsx'
 import DoctorSelection from './pages/DoctorrSelection/DoctorSelection.jsx'
 import AppointmentDashboard from './pages/AppointmentDashboard/AppointmentDashboard.jsx'
+import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard.jsx'
+import DoctorProfile from './pages/DoctorProfile/DoctorProfile.jsx'
 
 
 const router = createBrowserRouter([
@@ -37,6 +39,12 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: <AppointmentDashboard />
+  }, {
+    path: '/doctor/dashboard',
+    element: <DoctorDashboard />
+  }, {
+    path: '/doctor/profile',
+    element: <DoctorProfile />
   }
 ])
 

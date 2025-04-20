@@ -7,13 +7,15 @@ const { registerAppointment,
     getAppointmentByPatientId,
     getAppointmentByDoctorId,
     updateAppointmentById,
-    deleteAppointmentById } = require('./appointment.controller')
+    deleteAppointmentById,
+    countData, } = require('./appointment.controller')
 
 const router = express.Router()
 
 router.post('/register', registerAppointment)
 
 router.get('/', getAllAppointments)
+router.get('/count', countData)
 
 router.get('/:id', getAppointmentById)
 

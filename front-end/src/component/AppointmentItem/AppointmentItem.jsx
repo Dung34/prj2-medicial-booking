@@ -56,7 +56,11 @@ const AppointmentItem = ({ appointment, handleClick }) => {
             </div>
 
             {/* Doctor */}
-            <p className="text-gray-800">{patient.fullname}</p>
+            <div>
+                <p className="text-gray-800">{patient.fullname}</p>
+                <p className="text-gray-800">SĐT: {patient.phoneNumber}</p>
+            </div>
+
 
 
 

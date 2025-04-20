@@ -28,6 +28,11 @@ const appointmentSchema = new mongoose.Schema(
         note: {
             type: String,
             required: false
+        },
+        isSuccess: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     }
 )
