@@ -7,7 +7,7 @@ const app = express()
 const port = process.env.PORT || 3000
 // connect database
 
-const uri = "mongodb+srv://dungwork203:Hg1Fh7sxTuRT0vhE@cluster0.zoyjs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.DATABASE_URL || "mongodb+srv://dungwork203:Hg1Fh7sxTuRT0vhE@cluster0.zoyjs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 async function run() {
