@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import AppointmentSchedule from '../../component/AppointmentSchedule/AppointmentSchedule';
 import Navbar from '../../component/Navbar/Navbar';
-// const specialties = [
+
 //     "Tim mạch",
 //     "Tiêu hóa",
 //     "Hô hấp",
@@ -17,7 +17,6 @@ import Navbar from '../../component/Navbar/Navbar';
 
 
 const DoctorSelection = () => {
-    // Removed as it is unnecessary and causes an error
     const [selectSpeciality, setSelectSpeciality] = useState(null)
     const [specialities, setSpecialities] = useState([])
     const [haveSpec, setHaveSpec] = useState(false)
@@ -25,7 +24,7 @@ const DoctorSelection = () => {
     const [doctorsList, setDoctorsList] = useState([])
     const [error, setError] = useState(null)
     const [notification, setNotification] = useState(null)
-    const { speciality_name } = useParams()
+    const { speciality_id } = useParams()
     const navigate = useNavigate()
     const handleSearch = (doctorName) => {
         if (doctorName) {
@@ -41,16 +40,16 @@ const DoctorSelection = () => {
                 setNotification(null)
             }, 2000)
         } else {
-            navigate(`/doctors/${selectSpeciality.speciality_name}`)
+            navigate(`/doctors/${selectSpeciality._id}`)
             setDoctorsList([])
             setError(null)
             setNotification(null)
         }
     }
     useEffect(() => {
-        const getDoctors = async (speciality_name) => {
+        const getDoctors = async (speciality_id) => {
             try {
-                const response = await axios.get(`http://localhost:3000/speciality/getDocBySpecialityName/${speciality_name}`)
+                const response = await axios.get(`http://localhost:3000/speciality/getDocBySpecialityName/${speciality_id}`)
                 if (response.status === 200) {
                     setDoctorsList(response.data)
 
@@ -69,8 +68,8 @@ const DoctorSelection = () => {
 
             }
         }
-        getDoctors(speciality_name)
-    }, [speciality_name])
+        getDoctors(speciality_id)
+    }, [speciality_id])
     useEffect(() => {
         const getSpecialities = async () => {
             try {

@@ -1,7 +1,6 @@
 const Speciality = require('./speciality.model')
-
 const Doctor = require('../Doctors/doctor.model')
-const Speciality_Doctor = require('./speciality-doctor.model')
+
 
 const createSpeciality = async (req, res) => {
     try {
@@ -15,39 +14,7 @@ const createSpeciality = async (req, res) => {
 
 }
 
-const addSpecialityToDoctor = async (req, res) => {
-    try {
-        const { doctorId, specialityId, speciality_name } = req.body
-        const doctor = await Doctor.find({ "doctorId": doctorId })
 
-        if (!doctor) {
-            res.status(404).send({ "message": "Doctor not found" })
-        } else {
-            const speciality = await Speciality.findById(specialityId)
-            if (!speciality) {
-                res.status(404).send({ "message": "Speciality not found" })
-            }
-            else {
-                const speciality_Doctor = await Speciality_Doctor.findOne({ doctorId, specialityId })
-                if (speciality_Doctor) {
-                    res.status(400).send({ "message": "Chuyên khoa này đã có bác sĩ này rồi !" })
-                }
-                else {
-                    const speciality_Doctor = await Speciality_Doctor({ ...req.body })
-                    await speciality_Doctor.save()
-                    res.status(200).send({ "message": `Bác sĩ được chuyển vào chuyển vào khoa ${speciality_name} thành công !`, "data": speciality_Doctor })
-                }
-                // const speciality_Doctor = await Speciality_Doctor({ ...req.body })
-                // await speciality_Doctor.save()
-
-            }
-        }
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).send({ "meassage": error })
-    }
-}
 
 const getAllSpecialities = async (req, res) => {
     try {
@@ -92,33 +59,16 @@ const searchSpecialitybyId = async (req, res) => {
     }
 }
 
-const searchSpecialitybyDoctorId = async (req, res) => {
-    try {
-        const { doctor_id } = req.params
-        const specialities_doctor = await Speciality_Doctor.find({ doctor_id })
-        if (specialities_doctor.length === 0) {
-            res.status(404).send({ "message": "Doctor don't have any speciality" })
-        }
-        else {
-            res.status(200).send(specialities_doctor)
-        }
-    } catch (error) {
-        console.log(error)
-        res.status(500).send({ "meassage": error })
-    }
-}
 
 const getDocBySpecialityName = async (req, res) => {
     try {
-        const { speciality_name } = req.params
-        const specialities_doctor = await Speciality_Doctor.find({ speciality_name })
+        const { speciality_id } = req.params
+        const doctors = await Doctor.find({ speciality_id: speciality_id })
 
-        if (specialities_doctor.length === 0) {
-            res.status(404).send({ "message": "Speciality don't have any doctor" })
+        if (doctors.length === 0) {
+            res.status(404).send({ "message": "Chuyên khoa không có bác sĩ nào !" })
         }
         else {
-            const doctorIds = specialities_doctor.map(doc => doc.doctorId)
-            const doctors = await Doctor.find({ _id: { $in: doctorIds } })
             res.status(200).send(doctors)
         }
     } catch (error) {
@@ -128,10 +78,8 @@ const getDocBySpecialityName = async (req, res) => {
 }
 module.exports = {
     createSpeciality,
-    addSpecialityToDoctor,
     getAllSpecialities,
     deleteSpecialitybyID,
     searchSpecialitybyId,
-    searchSpecialitybyDoctorId,
     getDocBySpecialityName,
 }

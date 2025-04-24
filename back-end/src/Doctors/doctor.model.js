@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const Counter = require('../Counter/Counter.model')
 const Schedule = require('./doctorSchedule.model.js')
-const Image = require('./image.model.js')
 const doctorSchema = new mongoose.Schema(
     {
         _id: String,
@@ -23,11 +22,9 @@ const doctorSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        education: {
-            type: String, required: true
-        },
-        decription: {
-            type: String, required: true
+        address: {
+            type: String,
+            require: true,
         },
         status: {
             type: String,
@@ -37,6 +34,10 @@ const doctorSchema = new mongoose.Schema(
         languages: {
             type: [String],
             required: false,
+        },
+        speciality_id: {
+            type: String,
+            require: true
         }
     }
 )

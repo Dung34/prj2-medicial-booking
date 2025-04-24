@@ -22,8 +22,26 @@ const uploadImage = async (req, res) => {
     }
 }
 const registerDoctor = async (req, res) => {
+    const { fullname, phoneNumber, email, password, address, speciality_id } = req.body
     try {
+        const errors = {}
+        const existEmail = await Doctor.findOne({ email: email })
+        if (existEmail) {
+            errors.email = 'Email đã được sử dụng !'
 
+        }
+
+        const existPhoneNumber = await Doctor.findOne({ phoneNumber: phoneNumber })
+        if (existPhoneNumber) {
+            errors.phoneNumber = 'Số điện thoại đã được sử dụng'
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).send({
+                message: "Thong tin bi trung",
+                error: errors
+            })
+        }
 
         const newDoctor = await Doctor({ ...req.body })
 

@@ -7,8 +7,8 @@ const SelectSpeciality = () => {
     const [haveData, setHaveData] = useState(false)
     const [specialities, setSpecialities] = useState([])
     const navigate = useNavigate()
-    const handleClick = (speciality_name) => {
-        navigate(`/doctors/${speciality_name}`)
+    const handleClick = (speciality_id) => {
+        navigate(`/doctors/${speciality_id}`)
     }
     // const getSpecialities = async () => {
     //     try {
@@ -42,7 +42,7 @@ const SelectSpeciality = () => {
             {specialities.map((speciality) => (
                 <div key={speciality._id}
                     className="flex flex-col items-center size-20"
-                    onClick={() => handleClick(speciality.speciality_name)}>
+                    onClick={() => handleClick(speciality._id)}>
                     <img src={`/Speciality/${speciality.speciality_name}.png`} alt={speciality.speciality_name} />
                     <p>{speciality.speciality_name}</p>
                     {/* <button onClick={() => handleClick(speciality.id)}>{speciality.name}</button> */}

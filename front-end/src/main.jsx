@@ -13,6 +13,7 @@ import AppointmentDashboard from './pages/AppointmentDashboard/AppointmentDashbo
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard.jsx'
 import DoctorProfile from './pages/DoctorProfile/DoctorProfile.jsx'
 import RegisterDoctorForm from './pages/AppointmentDashboard/DoctorRegistrationForm.jsx'
+import DoctorProfileUpload from './pages/AppointmentDashboard/DoctorProfileUpload.jsx'
 
 
 const router = createBrowserRouter([
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
     errorElement: <div>404 Not Found</div>,
   },
   {
-    path: '/doctors/:speciality_name',
+    path: '/doctors/:speciality_id',
     element: <DoctorSelection />,
   },
   {
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/dashboard/register',
-    element: <RegisterDoctorForm />
+    element: <DoctorProfileUpload />
   },
   {
     path: '/doctor/dashboard',
