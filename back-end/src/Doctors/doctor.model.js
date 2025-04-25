@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Counter = require('../Counter/Counter.model')
-const Schedule = require('./doctorSchedule.model.js')
+const Schedule = require('../Model/doctorSchedule.model')
 const doctorSchema = new mongoose.Schema(
     {
         _id: String,

@@ -1,7 +1,8 @@
 const Doctor = require("./doctor.model")
-const timeOffModel = require("./timeOff.model")
-const Schedule = require("./doctorSchedule.model")
-const Image = require('./image.model')
+const timeOffModel = require("../Model/timeOff.model")
+const Schedule = require("../Model/doctorSchedule.model")
+const Image = require('../Model/image.model')
+const eduAndCertModel = require("../Model/eduAndCert.model")
 
 const uploadImage = async (req, res) => {
     try {
@@ -153,4 +154,31 @@ const accessTimeOff = async (req, res) => {
         res.status(500).send({ "message": "Internal server error", "error": error });
     }
 };
-module.exports = { registerDoctor, getAllDoctors, getDoctorById, updateDoctorById, deleteDoctorById, registerTimeOff, uploadImage } 
+
+const registerEduAndCert = async (req, res) => {
+    try {
+        const { doctor_id, educations, certifications } = req.body
+        const doctor = await Doctor.findById(doctor_id)
+        if (!doctor) {
+            res.status(404).send({ "message": "Khong tim thay bac si" })
+        } else {
+            const eduAndCert = await eduAndCertModel({ ...req.body })
+            await eduAndCert.save()
+            res.status(200).send({ "message": "Them thong tin thanh cong", "data": eduAndCert })
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "message": "Internal server error", "error": error })
+    }
+}
+module.exports = {
+    registerDoctor,
+    getAllDoctors,
+    getDoctorById,
+    updateDoctorById,
+    deleteDoctorById,
+    registerTimeOff,
+    uploadImage,
+    registerEduAndCert,
+} 
