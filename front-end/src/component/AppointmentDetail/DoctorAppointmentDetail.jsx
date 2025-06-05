@@ -4,24 +4,27 @@ import StatusBadge from '../StatusBadge/StatusBadge'
 import { CiCalendarDate } from "react-icons/ci";
 import { CiStickyNote } from "react-icons/ci";
 import { CiPhone } from "react-icons/ci";
+import { useNavigate } from 'react-router-dom';
+import EMR from './EMR';
 const DoctorAppointmentDetail = ({ appointment, isSelect }) => {
+  const navigate = useNavigate()
   const [patient, setPatient] = useState({})
   const [note, setNote] = useState("")
+  const [doctor, setDoctor] = useState({})
   const [notification, setNotification] = useState("")
   const [localAppointment, setLocalAppointment] = useState({})
   const apiUrl = import.meta.env.VITE_API_URL
   const token = localStorage.getItem('token')
   const saveNote = async (note) => {
     try {
-      const response = await axios.put(`${apiUrl}/appointment/${appointment._id}`, {
-        "note": note
+      const response = await axios.post(`${apiUrl}/appointment/update/${appointment._id}`, {
+        "note": `Bác sĩ ${doctor.fullname}: ${note}`
       })
       if (response.status == 200) {
-        setNotification("")
-        setNotification("Lưu ghi chú thành công")
+        alert("Luu ghi chu thanh cong !!")
       }
       else {
-        setNotification("Lưu ghi chú thất bại")
+        alert("Luu ghi chu that bai !!")
       }
     } catch (error) {
 
@@ -38,6 +41,14 @@ const DoctorAppointmentDetail = ({ appointment, isSelect }) => {
         if (response.status == 200) {
           setPatient(response.data)
         }
+        const doctorRes = await axios.get(`${apiUrl}/api/doctor/get-doctor/${appointment.doctor_id}`, {
+          headers: {
+            "Authorization": token
+          }
+        })
+        if (doctorRes.status == 200) {
+          setDoctor(doctorRes.data)
+        }
       } catch (error) {
 
       }
@@ -52,8 +63,14 @@ const DoctorAppointmentDetail = ({ appointment, isSelect }) => {
         <div className='flex flex-row justify-between'>
           <StatusBadge status={appointment.status} />
           <div className='space-x-2'>
-            <button className='border py-2 px-4 rounded-md border-gray-400 hover:bg-gray-200 bg-white text-black' type="button">Điều chỉnh</button>
-            <button className='py-2 px-4 rounded-md border-gray-400 bg-black text-white' type="button">Hoàn thành</button>
+            {appointment.isSuccess ? <button className='border py-2 px-4 rounded-md border-gray-400 hover:bg-gray-200 bg-white text-black' type="button">Điều chỉnh</button> :
+              appointment.status == 'confirm' ?
+                <button onClick={() => navigate(`/emr/${appointment._id}`)}
+                  className='py-2 px-4 rounded-md border-gray-400 bg-black text-white' type="button">Hoàn thành</button>
+                : null
+            }
+
+
           </div>
         </div>
         <div>
@@ -87,10 +104,11 @@ const DoctorAppointmentDetail = ({ appointment, isSelect }) => {
       </div>
       <div className='flex flex-col gap-2 p-4 border border-gray-400 rounded-md mt-8' >
         <p className='font-sans text-[20px] text-black'>Ghi chú</p>
-        <input className=' border border-gray-200 p-2 rounded-md ' type="text" name="" id="" value={note}
+        <input className=' border border-gray-200 p-2 rounded-md ' type="text" name="" id="" value={note || ""}
           onChange={(e) => { setNote(e.target.value) }} />
-        <div className='flex justify-end'><button onClick={() => saveNote(note)} className='border border-gray-200 py-2 px-4 bg-white text-black hover:bg-gray-200 rounded-md'>Lưu</button></div>
+        <div className='flex justify-end'><button onClick={(e) => saveNote(note)} className='border border-gray-200 py-2 px-4 bg-white text-black hover:bg-gray-200 rounded-md'>Lưu</button></div>
       </div>
+
     </div>
 
   )

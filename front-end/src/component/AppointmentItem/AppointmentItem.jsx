@@ -21,7 +21,7 @@ const AppointmentItem = ({ appointment, handleClick }) => {
             if (patientRes.status === 200) {
                 setPatient(patientRes.data)
             }
-            const doctorRes = await axios.get(`${apiUrl}/api/doctor/${appointment.doctor_id}`, {
+            const doctorRes = await axios.get(`${apiUrl}/api/doctor/get-doctor/${appointment.doctor_id}`, {
                 headers: {
                     "Authorization": token
                 }

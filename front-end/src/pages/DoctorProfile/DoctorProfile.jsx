@@ -86,39 +86,39 @@ const scheduleData = {
     ],
     lastUpdated: "April 10, 2025",
 };
-const DoctorProfile = ({ doctor }) => {
-
+const DoctorProfile = () => {
+    const [doctor, setDoctor] = useState({})
     const [error, setError] = useState('')
     const apiUrl = import.meta.env.VITE_API_URL
     const doctor_id = localStorage.getItem('id')
     const token = localStorage.getItem('token')
-    // useEffect(() => {
+    useEffect(() => {
 
-    //     const getData = async () => {
-    //         try {
-    //             const response = await axios.get(`${apiUrl}/api/doctor/${doctor_id}`, {
-    //                 headers: {
-    //                     Authorization: token
-    //                 }
-    //             })
-    //             if (response.status == 200) {
-    //                 setDoctor({})
-    //                 setDoctor(response.data)
-    //                 console.log(response.data)
-    //             }
-    //             else {
-    //                 setDoctor({})
-    //                 setError('')
-    //                 setError('Lỗi khi cố gắng lấy dữ liệu !!!')
-    //                 console.log(error)
-    //             }
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
+        const getData = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/api/doctor/get-doctor/${doctor_id}`, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
+                if (response.status == 200) {
+                    setDoctor({})
+                    setDoctor(response.data)
+                    console.log(response.data)
+                }
+                else {
+                    setDoctor({})
+                    setError('')
+                    setError('Lỗi khi cố gắng lấy dữ liệu !!!')
+                    console.log(error)
+                }
+            } catch (error) {
+                console.log(error)
+            }
 
-    //     }
-    //     getData()
-    // }, [doctor_id])
+        }
+        getData()
+    }, [doctor_id])
     return (
         <div>
             <div className='px-[10vw] flex flex-row gap-10'>
@@ -157,7 +157,7 @@ const DoctorProfile = ({ doctor }) => {
                                 <CiMap className='size-8' />
                                 <div className='flex flex-col gap-0'>
                                     <p className='font-sans font-medium text-[20px] p-0 m-0'>Địa chỉ</p>
-                                    <p className='font-sans font-light text-[16px] text-gray-400 p-0 m-0'>{doctor.education}</p></div>
+                                    <p className='font-sans font-light text-[16px] text-gray-400 p-0 m-0'>{doctor.address}</p></div>
                             </div>
                             <hr className='my-2' />
                             <div>

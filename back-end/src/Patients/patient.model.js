@@ -3,6 +3,10 @@ const Counter = require('../Counter/Counter.model')
 const patientSchema = new mongoose.Schema(
     {
         _id: String,
+        userId: {
+            type: String,
+            require: true,
+        },
         fullname: {
             type: String,
             required: true

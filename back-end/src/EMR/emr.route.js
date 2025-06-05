@@ -1,18 +1,20 @@
 const express = require('express');
 
 const router = express.Router();
-const { createEMR, getAllEMR, getEMRById, getEMRByAppointmentId, updateEMRById, deleteEMRById } = require('./emr.controller');
-
-router.post('/create', createEMR);
+const { createEMR, getAllEMR, getEMRById, getEMRByAppointmentId, updateEMRById, deleteEMRById, uploadEmrImage, getImageByAppId } = require('./emr.controller');
+const uploadToCloud = require('../Midlleware/multer')
+router.post('/create/:appId', createEMR);
 
 router.get('/', getAllEMR);
 
-router.get('/:id', getEMRById);
+router.get('/getEmr/:id', getEMRById);
 
 router.get('/appointment/:appointment_id', getEMRByAppointmentId);
 
-router.put('/update/:id', updateEMRById);
+router.post('/update/:id', updateEMRById);
 
+router.get('/getEmrImage/:id', getImageByAppId)
+router.post('/uploadImage/:id', uploadToCloud.array('images', 10), uploadEmrImage)
 router.delete('/:id', deleteEMRById);
 
 module.exports = router;

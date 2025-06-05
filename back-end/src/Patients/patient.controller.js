@@ -1,3 +1,4 @@
+const User = require('../Model/user.model')
 const Patient = require('./patient.model')
 
 const registerPatient = async (req, res) => {
@@ -96,4 +97,20 @@ const deletePatientById = async (req, res) => {
         res.status(500).send({ "message": "Internal server error", "error": error })
     }
 }
-module.exports = { registerPatient, getAllPatients, getPatientById, updatePatientById, deletePatientById }
+const getPatientByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).send({ "message": "Khong co nguoi dung nay" })
+        }
+        const patient = await Patient.findOne({ userId: userId })
+        if (!patient) {
+            return res.status(405).send({ 'message': "Benh nhan chua cap nhat thong tin !" })
+        }
+        return res.status(200).send({ "message": "Lay thong tin thanh cong !", "data": patient })
+    } catch (error) {
+        return res.status(500).send({ "message": error })
+    }
+}
+module.exports = { registerPatient, getAllPatients, getPatientById, updatePatientById, deletePatientById, getPatientByUserId }

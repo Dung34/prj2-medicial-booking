@@ -21,7 +21,7 @@ const Appointment = () => {
         const fetchData = async (doctor_id) => {
             try {
 
-                const doctorRes = await axios.get(`http://localhost:3000/api/doctor/${doctor_id}`, { headers: headers });
+                const doctorRes = await axios.get(`http://localhost:3000/api/doctor/get-doctor/${doctor_id}`, { headers: headers });
                 if (doctorRes.status !== 200) {
                     throw new Error('Xảy ra lỗi khi tải dữ liệu bác sĩ !!');
 

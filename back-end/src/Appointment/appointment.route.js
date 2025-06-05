@@ -23,7 +23,7 @@ router.get('/patient/:patient_id', getAppointmentByPatientId)
 
 router.get('/doctor/:doctor_id', getAppointmentByDoctorId)
 
-router.put('/:id', updateAppointmentById)
+router.post('/update/:id', updateAppointmentById)
 
 router.delete('/:id', deleteAppointmentById)
 

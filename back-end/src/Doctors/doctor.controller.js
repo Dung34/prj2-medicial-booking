@@ -3,6 +3,7 @@ const timeOffModel = require("../Model/timeOff.model")
 const Schedule = require("../Model/doctorSchedule.model")
 const Image = require('../Model/image.model')
 const eduAndCertModel = require("../Model/eduAndCert.model")
+const User = require("../Model/user.model")
 
 const uploadImage = async (req, res) => {
     try {
@@ -74,12 +75,12 @@ const getDoctorById = async (req, res) => {
         const { id } = req.params
         const doctor = await Doctor.findById(id)
         if (!doctor) {
-            res.status(404).send({ "mesage": "Doctor not found" })
+            return res.status(404).send({ "message": "Doctor not found" })
         }
-        res.status(200).send(doctor)
+        return res.status(200).send(doctor)
     } catch (error) {
         console.log(error)
-        res.status(500).send({ "meassage": "Internal server error", "error": error })
+        return res.status(500).send({ "message": "Internal server error", "error": error })
     }
 }
 //update doctor by id 
@@ -127,37 +128,69 @@ const registerTimeOff = async (req, res) => {
 }
 const accessTimeOff = async (req, res) => {
     try {
-        const { _id, doctor_id } = req.body
-        const doctor = await Doctor.findById(doctor_id)
+        const { _id, doctor_id } = req.body;
+        const doctor = await Doctor.findById(doctor_id);
         if (!doctor) {
-            res.status(404).send({ "message": "Lỗi xay ra, không tìm thấy bác sĩ !!" })
-        } else {
-
-            const timeOff = await timeOffModel.findByIdAndUpdate(
-                _id,
-                { access: true },
-                { new: true }
-            );
-            const schedule = await Schedule.findOneAndUpdate(
-                {
-                    doctor_id: doctor_id,
-                    upcomingTimeOff: [...(schedule?.upcomingTimeOff || []), {
-                        title: timeOff?.title || "",
-                        date: timeOff?.date || ""
-                    }]
-                }
-            )
-
+            return res.status(404).send({ "message": "Lỗi xay ra, không tìm thấy bác sĩ !!" });
         }
+
+        const timeOff = await timeOffModel.findByIdAndUpdate(
+            _id,
+            { access: true },
+            { new: true }
+        );
+
+        const schedule = await Schedule.findOneAndUpdate(
+            { doctor_id: doctor_id },
+            {
+                $push: {
+                    upcomingTimeOff: {
+                        title: timeOff.title || "",
+                        date: timeOff.date || ""
+                    }
+                }
+            },
+            { new: true }
+        );
+
+        return res.status(200).send({ "message": "Cập nhật thành công", "timeOff": timeOff, "schedule": schedule });
     } catch (error) {
         console.log(error);
-        res.status(500).send({ "message": "Internal server error", "error": error });
+        return res.status(500).send({ "message": "Internal server error", "error": error });
     }
 };
+const getDoctorSchedule = async (req, res) => {
+    try {
+        const { doctor_id } = req.params
+        const doctor = await Doctor.findById(doctor_id)
+        if (!doctor) {
+            res.status(404).send({ "message": "Khong tim thay bac si nao" })
+        }
+        const schedule = await Schedule.findOne({ doctor_id: doctor_id })
+        res.status(200).send(schedule)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "message": "Internal server error", "error": error })
+    }
+}
 
+const getDoctorProfileImage = async (req, res) => {
+    try {
+        const { doctor_id } = req.query
+        const doctor = await Doctor.findById(doctor_id)
+        if (!doctor) {
+            return res.status(404).send({ "message": "Khong tim thay bac si" })
+        }
+        const imageUrl = await Image.findOne({ doctor_id: doctor_id })
+        return res.status(200).send({ "imageUrl": imageUrl?.url })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ "message": "Internal server error", "error": error })
+    }
+}
 const registerEduAndCert = async (req, res) => {
     try {
-        const { doctor_id, educations, certifications } = req.body
+        const { doctor_id } = req.query
         const doctor = await Doctor.findById(doctor_id)
         if (!doctor) {
             res.status(404).send({ "message": "Khong tim thay bac si" })
@@ -172,6 +205,66 @@ const registerEduAndCert = async (req, res) => {
         res.status(500).send({ "message": "Internal server error", "error": error })
     }
 }
+
+const getEduAndCert = async (req, res) => {
+    try {
+        const { doctor_id } = req.query
+        const doctor = await Doctor.findById(doctor_id)
+        if (!doctor) {
+            res.status(404).send({ "message": "Khong tim thay bac si" })
+        } else {
+            const eduAndCert = await eduAndCertModel.findOne({ doctor_id: doctor_id })
+            if (!eduAndCert) {
+                res.status(404).send({ "message": "Thong tin chua duoc dang ky !" })
+            } else {
+                res.status(200).send({ eduAndCert })
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "message": "Internal server error", "error": error })
+    }
+}
+const updateEduAndCert = async (req, res) => {
+    try {
+        const { doctor_id } = req.query
+        const doctor = await Doctor.findById(doctor_id)
+        if (!doctor) {
+            res.status(404).send({ "message": "Khong tim thay bac si" })
+        } else {
+            const eduAndCert = await eduAndCertModel.findOneAndUpdate(
+                { doctor_id: doctor_id },
+                { ...req.body },
+                { new: true }
+            )
+            if (!eduAndCert) {
+                res.status(404).send({ "message": "Khong tim thay thong tin" })
+            } else {
+                res.status(200).send({ "message": "Cap nhat thong tin thanh cong", "data": eduAndCert })
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "message": "Internal server error", "error": error })
+    }
+}
+const getDoctorByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).send({ "message": "Khong tim thay nguoi dung nay !" })
+        }
+        const doctor = await Doctor.findOne({ userId: userId })
+        if (!doctor) {
+            return res.status(405).send({ "message": "Bac si nay chua cap nhat thong tin" })
+        }
+        return res.status(200).send({ "message": "Lay thong tin bac si thanh cong !", "data": doctor })
+
+    } catch (error) {
+        return res.status(500).send({ "message": error })
+    }
+}
 module.exports = {
     registerDoctor,
     getAllDoctors,
@@ -181,4 +274,9 @@ module.exports = {
     registerTimeOff,
     uploadImage,
     registerEduAndCert,
+    getDoctorSchedule,
+    getDoctorProfileImage,
+    getEduAndCert,
+    updateEduAndCert,
+    getDoctorByUserId
 } 

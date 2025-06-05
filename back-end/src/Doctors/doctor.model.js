@@ -4,6 +4,10 @@ const Schedule = require('../Model/doctorSchedule.model')
 const doctorSchema = new mongoose.Schema(
     {
         _id: String,
+        userId: {
+            type: String,
+            require: true,
+        },
         fullname: {
             type: String,
             required: true,

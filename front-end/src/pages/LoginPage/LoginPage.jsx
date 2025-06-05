@@ -1,64 +1,75 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { IoMailOpenOutline } from "react-icons/io5";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa6";
-import ZaloIcon from '../../assets/Icons/zaloIcon.png'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import logo from '../../assets/Icons/medicine.png'
+import { useAuth } from '../../context/AuthContext';
 const LoginPage = () => {
     const navigate = useNavigate();
+    const { login, error } = useAuth()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('')
 
-    const handleLoginbyFb = async () => {
-        setError('Chức năng này chưa khả dụng')
+    const [notification, setNotification] = useState('')
+    const [role, setRole] = useState('patient')
+    const apiUrl = import.meta.env.VITE_API_URL
 
-        setShowNotification(true)
-        setTimeout(() => {
-            setError('')
-        }, 3000)
-    }
     const [showNotification, setShowNotification] = useState(false)
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        // Handle login logic here (e.g., API call)
+
+    const handleSignIn = async (e) => {
+        e.preventDefault()
+
         try {
-            const response = await axios.post('http://localhost:3000/login', {
-                email,
-                password
-            });
-            if (response.status == 200) {
-                console.log("id: ", response.data.id);
-                localStorage.clear()
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('id', response.data.id);
-
-                setError("Đăng nhập thành công")
+            if (password != confirmPassword) {
+                alert('Mật khẩu chưa trùng nhau !!!')
                 setShowNotification(true)
-
                 setTimeout(() => {
-                    if (response.data.role === "patient") {
-                        navigate('/')
-                    } else {
-                        if (response.data.role === "doctor") {
-                            navigate('/dashboard/doctor')
-                        } else {
-                            navigate('/dashboard')
-                        }
-                    }
-                }, 3000);
+
+                    setShowNotification(false)
+                    setPassword('')
+                    setConfirmPassword('')
+                }, 5000)
+            }
+            const response = await axios.post(`${apiUrl}/login/signIn`, {
+                "email": email,
+                "password": password,
+                "role": "patient"
+            })
+
+            if (response.status == 200) {
+
+                setNotification(true)
+                alert(response.data.message)
+                navigate('/register')
+            } else {
+                if (response.status == 201) {
+                    alert(response.data.message)
+                }
             }
 
-        } catch (error) {
-            console.error('Error:', error);
-            setError('Không thể đăng nhập, vui lòng kiểm tra lại thông tin tài khoản của bạn!');
-            setShowNotification(true)
-            setTimeout(() => {
-                setShowNotification(false)
-            }, 3000)
+
+        } catch (err) {
+            alert("Đăng ký thất bại hãy thử lại !")
+        }
+    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Handle login logic here (e.g., API call)
+        try {
+            await login(email, password)
+            if (error) {
+                alert(error)
+            } else {
+                alert("Dang nhap thanh cong")
+
+                setTimeout(() => { navigate('/') })
+            }
+
+        } catch (err) {
+            console.error('Error:', err);
+            alert("Có lỗi không thể đăng nhập !!!")
         }
     };
 
@@ -79,71 +90,80 @@ const LoginPage = () => {
                 <p className="text-gray-600 text-center mb-6">
                     Nơi sức khỏe bắt đầu bằng sự quan tâm.
                 </p>
+                <TabGroup>
+                    <TabList className='grid grid-cols-2 mb-2 rounded-lg'>
+                        <Tab className='bg-gray-200 px-2 py-2'>Đăng nhập</Tab>
+                        <Tab className='bg-gray-200 px-2 py-2'>Đăng ký </Tab>
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel>
+                            <div>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Nhập email"
+                                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Nhập mật khẩu"
+                                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
 
-                <div className="flex gap-4 w-full mb-4">
-                    <button onClick={handleLoginbyFb} className="flex justify-center items-center px-4 gap-2 border border-gray-300 rounded-md py-2 hover:bg-gray-50">
+                                <button onClick={handleSubmit}
+                                    className="w-full bg-[#d5af7e] text-white rounded-md py-2 hover:bg-[#ffd196] transition">
+                                    Đăng nhập ngay
+                                </button>
 
-                        <FcGoogle className='size-4' />
-                        Google
-                    </button>
-                    <button onClick={handleLoginbyFb} className="flex justify-center items-center px-4 gap-2 border border-gray-300 rounded-md py-2 hover:bg-gray-50">
-                        <img src={ZaloIcon} alt="" className='size-4' />
-                        Zalo
-                    </button>
+                                {error && showNotification && (
+                                    <div className="mt-4 text-red-500 text-center">
+                                        {error}
+                                    </div>
+                                )}</div>
+                        </TabPanel>
+                        <TabPanel>
+                            <div>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Nhập email"
+                                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Nhập mật khẩu"
+                                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Nhập lại mật khẩu"
+                                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                                <button onClick={handleSignIn}
+                                    className="w-full bg-[#d5af7e] text-white rounded-md py-2 hover:bg-[#ffd196] transition">
+                                    Đăng ký tài khoản
+                                </button>
 
-                    <button onClick={handleLoginbyFb} className="flex justify-center items-center px-4 gap-2 border border-gray-300 rounded-md py-2 hover:bg-gray-50">
-                        <FaFacebook className='size-4 text-[#0866ff]' />
-                        Facebook
-                    </button>
-                </div>
+                                {error && showNotification && (
+                                    <div className="bg-red-500 text-white font-mono text-[16px] p-2 rounded-md">
+                                        {error}
+                                    </div>
+                                )}</div>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
 
-                <div className="w-full text-center text-gray-400 mb-4">
-                    <div className="relative w-full">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="bg-white px-2 text-gray-400">
-                                Hoặc
-                            </span>
-                        </div>
-                    </div>
-                </div>
 
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Nhập email"
-                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Nhập mật khẩu"
-                    className="w-full border border-gray-300 rounded-md p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <button onClick={handleSubmit}
-                    className="w-full bg-purple-600 text-white rounded-md py-2 hover:bg-purple-700 transition">
-                    Đăng nhập ngay
-                </button>
-                {error && showNotification && (
-                    <div className="mt-4 text-red-500 text-center">
-                        {error}
-                    </div>
-                )}
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                    Chưa có tài khoản ? Đăng ký {" "}
-                    <a href="#" className="text-blue-600 underline">
-                        tại đây
-                    </a>{" "}
-                    hoặc liên hệ với chúng tôi qua email {""}
-                    .
-                </p>
-                <p className="text-xs text-gray-400 mt-1 text-center">
-                    Dung.nv210227@hust.edu.vn
-                </p>
+
+
             </div>
         </div>
     )

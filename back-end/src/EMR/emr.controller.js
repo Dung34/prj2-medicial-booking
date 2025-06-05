@@ -1,7 +1,13 @@
 const EMR = require('./emr.model')
-
+const Appointment = require('../../src/Appointment/appointment.model')
+const emrImageModel = require('../Model/emrImage.model')
 const createEMR = async (req, res) => {
     try {
+        const { appId } = req.params
+        const appointment = await Appointment.findById(appId)
+        if (!appointment) {
+            return res.status(404).send({ "message": "Appointment not found!!" })
+        }
         const newEMR = await EMR({ ...req.body })
         await newEMR.save()
         res.status(200).send({ "message": "EMR created successfully", "data": newEMR })
@@ -10,7 +16,50 @@ const createEMR = async (req, res) => {
         res.status(500).send({ "meassage": error })
     }
 }
+const uploadEmrImage = async (req, res) => {
+    try {
+        const { id } = req.params
+        const appointment = await Appointment.findById(id)
+        if (!appointment) {
+            return res.status(404).send({ "message": "Khong tim thay lich hen nao" })
 
+        }
+        let imageUrl = []
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const newImage = new emrImageModel({
+                    url: file.path,
+                    appointment_id: id
+                })
+                await newImage.save()
+
+            }
+            return res.status(200).send({ 'message': "Upload anh thanh cong !!" })
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "meassage": error })
+    }
+}
+
+const getImageByAppId = async (req, res) => {
+    try {
+        const { id } = req.params
+        const appointment = await Appointment.findById(id)
+        if (!appointment) {
+            return req.status(404).send({ "message": "Khong tim thay lich hen nao" })
+        }
+        const images = await emrImageModel.find({ appointment_id: id });
+        if (!images) {
+            return res.status(404).send({ "message": "Benh an khong co anh " })
+
+        }
+        return res.status(200).send({ images })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ "meassage": error })
+    }
+}
 const getAllEMR = async (req, res) => {
     try {
         const emrs = await EMR.find()
@@ -24,10 +73,15 @@ const getEMRById = async (req, res) => {
     try {
         const { id } = req.params
         const emr = await EMR.findById(id)
+
         if (!emr) {
-            res.status(404).send({ "mesage": "EMR not found" })
+            return res.status(404).send({ "mesage": "EMR not found" })
         }
-        res.status(200).send(emr)
+        const appointment = await Appointment.findById(emr.appoinment_id)
+        if (!appointment) {
+            return res.status(404).send({ "message": "Appointment not found !!" })
+        }
+        return res.status(200).send({ emr, appointment })
     } catch (error) {
         console.log(error)
         res.status(500).send({ "meassage": error })
@@ -85,5 +139,7 @@ module.exports = {
     getEMRById,
     getEMRByAppointmentId,
     updateEMRById,
-    deleteEMRById
+    deleteEMRById,
+    uploadEmrImage,
+    getImageByAppId,
 }

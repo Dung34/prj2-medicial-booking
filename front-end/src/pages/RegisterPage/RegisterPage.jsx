@@ -61,7 +61,7 @@ const RegisterPage = () => {
         <div className="relative flex flex-col items-center justify-center h-screen">
             {/* Form */}
             <form className="border border-gray-300 p-8 rounded-lg z-10 shadow-md w-[1000px] " onSubmit={handleSubmit} >
-                <h2 className="text-2xl font-semibold mb-4">Đăng ký tài khoản</h2>
+                <h2 className="text-2xl font-semibold mb-4">Cập nhật thông tin người bệnh</h2>
                 <div className='grid grid-cols-2 gap-4'>
                     <input
                         type="text"

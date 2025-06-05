@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Select } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import EMR from './EMR';
 const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) => {
     const navigate = useNavigate()
     if (!appointment) return null;
@@ -171,6 +172,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             Điều chỉnh
                         </button>
                     </div>
+
                 </DialogPanel>
             </div>
         </Dialog>

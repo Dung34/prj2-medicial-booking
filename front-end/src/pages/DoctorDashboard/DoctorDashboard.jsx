@@ -5,13 +5,17 @@ import DoctorAppointItem from '../../component/DoctorAppointItem/DoctorAppointIt
 import DoctorAppointmentDetail from '../../component/AppointmentDetail/DoctorAppointmentDetail'
 import Navbar from '../../component/Navbar/Navbar'
 import DoctorProfile from '../DoctorProfile/DoctorProfile'
-import { CiCalendar, CiUser } from "react-icons/ci";
+import { CiCalendar, CiUser, CiSearch } from "react-icons/ci";
+import ListEmr from '../EMR/ListEmr'
 const DoctorDashboard = () => {
     const [appointments, setAppointments] = useState([])
     const [selectAppoint, setSelectAppoint] = useState({})
     const [isSelect, setIsSelect] = useState(false)
     const [successAppointment, setSuccessAppointment] = useState([])
     const [notsuccessAppointment, setNotsuccessAppointment] = useState([])
+
+    const [status, setStatus] = useState('')
+    const [patientId, setPatientId] = useState('')
     const [doctor, setDoctor] = useState({})
     const apiUrl = import.meta.env.VITE_API_URL
     const doctorId = localStorage.getItem("id")
@@ -25,7 +29,7 @@ const DoctorDashboard = () => {
         const getData = async () => {
             try {
                 const response = await axios.get(`${apiUrl}/appointment/doctor/${doctorId}`)
-                const doctorRes = await axios.get(`${apiUrl}/api/doctor/${doctorId}`)
+                const doctorRes = await axios.get(`${apiUrl}/api/doctor/get-doctor/${doctorId}`)
                 const success = []
                 const notSuccess = []
                 if (response.status == 200) {
@@ -52,6 +56,19 @@ const DoctorDashboard = () => {
 
         getData()
     }, [])
+    //Loc lich kham
+    const filterAppointments = notsuccessAppointment.filter(appointment => {
+        const matchStatus = status === '' || appointment.status === status
+        const matchId = patientId === '' || appointment.patient_id === patientId.toUpperCase()
+        return matchStatus && matchId
+    }
+    )
+    const filterSuccessAppointments = successAppointment.filter(
+        appointment => {
+            const matchId = patientId === '' || appointment.patient_id === patientId.toUpperCase()
+            return matchId
+        }
+    )
     return (
         <div>
             <Navbar />
@@ -65,6 +82,10 @@ const DoctorDashboard = () => {
                     <Tab className='flex flex-row items-center gap-2 data-[selected]:text-black'>
                         <CiUser className='size-6' />
                         <p className='font-sans font-light text-gray-600 text-[20px] hover:text-black'>Hồ sơ</p>
+                    </Tab>
+                    <Tab className='flex flex-row items-center gap-2 data-[selected]:text-black'>
+                        <CiUser className='size-6' />
+                        <p className='font-sans font-light text-gray-600 text-[20px] hover:text-black'>Bệnh án</p>
                     </Tab>
                 </TabList>
                 <TabPanels>
@@ -81,40 +102,108 @@ const DoctorDashboard = () => {
                                         <Tab className="bg-gray-200 text-gray-600 data-[selected]:bg-white data-[selected]:text-black outline-0 py-2 px-2">Đã hoàn thành</Tab>
                                     </TabList>
                                     <TabPanels>
-                                        <TabPanel className="px-8">
-
-                                            {notsuccessAppointment.length > 0 ? (
-                                                notsuccessAppointment.map((appointment, index) => (
-                                                    <DoctorAppointItem
-                                                        key={appointment._id}
-                                                        appointment={appointment}
-                                                        isSelected={appointment._id === selectAppoint._id}
-                                                        handleClick={() => onClick(appointment)}
-
-                                                    />
-                                                ))
-                                            ) : (
-                                                <div>
-                                                    <p>Hiện không có cuộc hẹn nào !!!</p>
+                                        <TabPanel className="">
+                                            <div className='flex flex-col gap-4'>
+                                                <div className='flex flex-row justify-between'>
+                                                    <div className='flex flex-row items-center border border-gray-400 w-fit px-4 py-2 rounded-lg gap-2'>
+                                                        <CiSearch />
+                                                        <input className='focus:outline-none focus:ring-0 text-[14px] text-gray-400'
+                                                            type="text" name="patientName" id="patientName" placeholder='Tìm kiếm bệnh nhân ...'
+                                                            value={patientId} onChange={(e) => setPatientId(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <select value={status} onChange={(e) => setStatus(e.target.value)}
+                                                            className='focus:outline-none focus:ring-0  text-[14px] border border-gray-400 px-4 py-2 rounded-md' name="status" id="status">
+                                                            <option value="">-- Trạng thái --</option>
+                                                            <option value="pending">Chờ xác nhận</option>
+                                                            <option value="confirm">Xác nhận</option>
+                                                            <option value="success">Hoàn thành</option>
+                                                            <option value="cancelled">Đã hủy</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            )}
+                                                {/* bang danh sach benh nhan */}
+
+                                                <div className="rounded-md border">
+                                                    <table className='w-full table-auto text-[14px]'>
+                                                        <thead>
+                                                            <tr className="border-b border-gray-400 text-left">
+                                                                <th className=' py-1 px-2'>Mã số</th>
+                                                                <th className=' py-1 px-2'>Bệnh nhân</th>
+                                                                <th className=' py-1 px-2'>Thời gian</th>
+                                                                <th className=' py-1 px-2'>Trạng thái</th>
+                                                                <th className=' py-1 px-2'></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {filterAppointments && filterAppointments.map((app, index) => (
+                                                                <DoctorAppointItem key={app._id} appointment={app} handleClick={(e) => onClick(app)} />
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
 
 
                                         </TabPanel>
                                         <TabPanel>
-                                            appointments đã hoàn thành
+                                            <div className='flex flex-col gap-4'>
+                                                <div className='flex flex-row justify-between'>
+                                                    <div className='flex flex-row items-center border border-gray-400 w-fit px-4 py-2 rounded-lg gap-2'>
+                                                        <CiSearch />
+                                                        <input className='focus:outline-none focus:ring-0 text-[14px] text-gray-400'
+                                                            type="text" name="patientName" id="patientName" placeholder='Tìm kiếm bệnh nhân ...' />
+                                                    </div>
+                                                    {/* <div>
+                                                        <select className='focus:outline-none focus:ring-0  text-[14px] border border-gray-400 px-4 py-2 rounded-md' name="status" id="status">
+                                                            <option value="">-- Trạng thái --</option>
+                                                            <option value="pending">Chờ xác nhận</option>
+                                                            <option value="confirm">Xác nhận</option>
+                                                            <option value="success">Hoàn thành</option>
+                                                            <option value="cancell">Đã hủy</option>
+                                                        </select>
+                                                    </div> */}
+                                                </div>
+                                                {/* bang danh sach benh nhan */}
+
+                                                <div className="rounded-md border">
+                                                    <table className='w-full table-auto text-[14px]'>
+                                                        <thead>
+                                                            <tr className="border-b border-gray-400 text-left">
+                                                                <th className=' py-1 px-2'>Mã số</th>
+                                                                <th className=' py-1 px-2'>Bệnh nhân</th>
+                                                                <th className=' py-1 px-2'>Thời gian</th>
+                                                                <th className=' py-1 px-2'>Trạng thái</th>
+                                                                <th className=' py-1 px-2'></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {filterSuccessAppointments && filterSuccessAppointments.map((app, index) => (
+                                                                <DoctorAppointItem key={app._id} appointment={app} handleClick={(e) => onClick(app)} />
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
                                         </TabPanel>
                                     </TabPanels>
                                 </TabGroup>
                             </div>
                             <div className='w-3/7'>
-                                <p className='text-blue-400 font-bold text-3xl'>Thông tin chi tiết</p>
+                                <p className='font-mono font-bold text-2xl'>Thông tin chi tiết</p>
                                 {isSelect ? (<DoctorAppointmentDetail appointment={selectAppoint} />) : (null)}
+
                             </div>
                         </div>
                     </TabPanel>
                     <TabPanel>
                         <DoctorProfile doctor={doctor} />
+                    </TabPanel>
+                    <TabPanel>
+                        <ListEmr />
                     </TabPanel>
                 </TabPanels>
             </TabGroup>

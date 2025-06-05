@@ -1,7 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-
+const cookieParser = require('cookie-parser')
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 3000
@@ -24,7 +24,11 @@ async function run() {
 run().catch(console.dir);
 //middleware
 app.use(express.json())
-app.use(cors())
+app.use(cookieParser())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}))
 
 //routes
 const doctorRoute = require('./src/Doctors/doctor.route')

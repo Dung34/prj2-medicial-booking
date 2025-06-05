@@ -14,8 +14,12 @@ import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard.jsx'
 import DoctorProfile from './pages/DoctorProfile/DoctorProfile.jsx'
 import RegisterDoctorForm from './pages/AppointmentDashboard/DoctorRegistrationForm.jsx'
 import DoctorProfileUpload from './pages/AppointmentDashboard/DoctorProfileUpload.jsx'
-
-
+import DoctorManagement from './pages/AppointmentDashboard/DoctorManagement.jsx'
+import DoctorEdit from './pages/DoctorProfile/DoctorEdit.jsx'
+import EMRPage from './pages/EMR/EMRPage.jsx'
+import EMREdit from './pages/EMR/EMREdit.jsx'
+import RegisterPageVer2 from './pages/RegisterPage/RegisterPageVer2.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -43,18 +47,32 @@ const router = createBrowserRouter([
     element: <AppointmentDashboard />
   },
   {
+    path: '/dashboard/edit',
+    element: <DoctorEdit />
+  },
+  {
     path: '/dashboard/register',
     element: <DoctorProfileUpload />
   },
   {
     path: '/doctor/dashboard',
     element: <DoctorDashboard />
+  },
+  {
+    path: '/emr/:appId',
+    element: <EMRPage />
+  },
+  {
+    path: '/emr/edit/:emrId',
+    element: <EMREdit />
   }
 ])
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
 
-    <RouterProvider router={router} />
   </React.StrictMode>
 )
