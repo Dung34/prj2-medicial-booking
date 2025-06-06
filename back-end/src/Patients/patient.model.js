@@ -7,27 +7,18 @@ const patientSchema = new mongoose.Schema(
             type: String,
             require: true,
         },
-        fullname: {
+        sername: {
             type: String,
-            required: true
+            require: true
+        },
+        name: {
+            type: String,
+            require: true
         },
         phoneNumber: {
             type: String,
             required: true,
             unique: true
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        password: {
-            type: String,
-            required: true
-        },
-        address: {
-            type: String,
-            required: true,
         },
         dateOfBirth: {
             type: Date,
@@ -45,13 +36,46 @@ const patientSchema = new mongoose.Schema(
             type: String,
 
         },
-        note: {
-            type: [String],
+        address: {
+            type: String,
+            require: true,
+        },
+        addressCity: {
+            type: String,
+            require: true,
+        },
+        addressDistrict: {
+            type: String,
+            require: true,
         },
         status: {
             type: String,
             required: true,
             default: 'active',
+        },
+        contactName: {
+            type: String,
+        },
+        contactPhoneNumber: {
+            type: String,
+        },
+        contactRelationship: {
+            type: String,
+        },
+        height: {
+            type: String
+        },
+        allergy: {
+            type: String
+        },
+        currentMedical: {
+            type: String
+        },
+        medicalHistory: {
+            type: String,
+        },
+        zipCode: {
+            type: String
         }
     }
 )

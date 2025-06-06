@@ -92,7 +92,8 @@ router.post('/signIn', async (req, res) => {
         return res.status(200).send({ message: "Đăng ký người dùng thành công !!!" })
 
     } catch (error) {
-
+        console.log(error)
+        return res.status(500).send({ "message": error })
     }
 })
 

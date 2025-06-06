@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [accessToken, setAccessToken] = useState(null)
 
     const [error, setError] = useState(null)
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState({})
 
     const [patient, setPatient] = useState(null)
 
@@ -48,6 +48,31 @@ export const AuthProvider = ({ children }) => {
 
     }
 
+    const registerUser = async (email, password, role) => {
+        try {
+            const response = await axios.post(`${apiUrl}/login/signIn`, {
+                "email": email,
+                "password": password,
+                "role": role
+            })
+            if (response.status == 200) {
+                setUser({
+                    "email": email,
+                    "password": password,
+                    "role": role
+                })
+
+
+            }
+            if (response.status == 201) {
+                setError(response.data.message)
+            }
+            alert(response.data.message)
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     const logout = async () => {
         await axios.post(`${apiUrl}/login/logout`, {}, { withCredentials: true })
         setAccessToken(null)
@@ -57,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ accessToken, user, doctor, patient, login, logout, error }} >
+        <AuthContext.Provider value={{ accessToken, user, doctor, patient, login, logout, error, registerUser }} >
             {children}
         </AuthContext.Provider>
     )

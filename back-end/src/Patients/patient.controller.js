@@ -3,40 +3,13 @@ const Patient = require('./patient.model')
 
 const registerPatient = async (req, res) => {
     try {
-        const { fullname, phoneNumber, email, password, address, dateOfBirth, gender, identificationNumber, bloodType, note } = req.body
-
-        const existPatient = await Patient.findOne({
-            $or: [
-                { phoneNumber },
-                { email },
-                { identificationNumber }
-            ]
-        })
-        if (existPatient) {
-            if (existPatient.phoneNumber === phoneNumber) {
-                return res.status(400).send({ "message": "Số điện thoại đã tồn tại" })
-            }
-            if (existPatient.email === email) {
-                return res.status(400).send({ "message": "Email đã tồn tại" })
-            }
-            if (existPatient.identificationNumber === identificationNumber) {
-                return res.status(400).send({ "message": "Số CCCD đã tồn tại" })
-            }
-        } else {
-            const newPatient = await Patient({ ...req.body })
-            await newPatient.save()
-            res.status(200).send({ "message": "Đăng ký bệnh nhân thành công", "data": newPatient })
-            // console.log("Patient registered successfully" + newPatient)
-            console.log("Đăng ký bệnh nhân thành công")
-        }
-
-        // const newPatient = await Patient({ ...req.body })
-        // await newPatient.save()
-        // res.status(200).send({ "message": "Patient registered successfully", "data": newPatient })
-        // console.log("Patient registered successfully" + newPatient)
+        const { userId } = req.params
+        const patient = await Patient({ ...req.body, userId: userId })
+        await patient.save()
+        return res.status(200).send({ "message": "Đăng ký thông tin bệnh nhân thành công !" })
     } catch (error) {
         console.log(error)
-        res.status(500).send({ "message": "Internal server error", "error": error })
+        return res.status(500).send({ "message": "Internal server error", "error": error })
     }
 }
 

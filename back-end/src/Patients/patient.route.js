@@ -6,7 +6,7 @@ const verifyToken = require('../Auth/verifyToken')
 
 const router = express.Router()
 
-router.post('/register', registerPatient)
+router.post('/register/:userId', registerPatient)
 
 router.get('/user/:userId', getPatientByUserId)
 
