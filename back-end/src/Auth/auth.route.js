@@ -88,8 +88,9 @@ router.post('/signIn', async (req, res) => {
         else {
             const newUser = await User({ ...req.body })
             await newUser.save()
+            return res.status(200).send({ message: "Đăng ký người dùng thành công !!!", "data": newUser })
         }
-        return res.status(200).send({ message: "Đăng ký người dùng thành công !!!" })
+
 
     } catch (error) {
         console.log(error)

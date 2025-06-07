@@ -6,7 +6,7 @@ import logo from '../../assets/Icons/medicine.png'
 import { useAuth } from '../../context/AuthContext';
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login, error } = useAuth()
+    const { login, error, registerUser } = useAuth()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -23,31 +23,11 @@ const LoginPage = () => {
         try {
             if (password != confirmPassword) {
                 alert('Mật khẩu chưa trùng nhau !!!')
-                setShowNotification(true)
-                setTimeout(() => {
-
-                    setShowNotification(false)
-                    setPassword('')
-                    setConfirmPassword('')
-                }, 5000)
+                setPassword('')
+                setConfirmPassword('')
             }
-            const response = await axios.post(`${apiUrl}/login/signIn`, {
-                "email": email,
-                "password": password,
-                "role": "patient"
-            })
-
-            if (response.status == 200) {
-
-                setNotification(true)
-                alert(response.data.message)
-                navigate('/register')
-            } else {
-                if (response.status == 201) {
-                    alert(response.data.message)
-                }
-            }
-
+            registerUser(email, password, role)
+            navigate('/register')
 
         } catch (err) {
             alert("Đăng ký thất bại hãy thử lại !")

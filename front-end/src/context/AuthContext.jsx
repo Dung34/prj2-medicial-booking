@@ -56,15 +56,12 @@ export const AuthProvider = ({ children }) => {
                 "role": role
             })
             if (response.status == 200) {
-                setUser({
-                    "email": email,
-                    "password": password,
-                    "role": role
-                })
+                setUser(response.data.data)
 
 
             }
             if (response.status == 201) {
+                setUser({})
                 setError(response.data.message)
             }
             alert(response.data.message)

@@ -4,7 +4,11 @@ import axios from 'axios';
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { CiUser, CiPhone, CiHeart } from "react-icons/ci";
 import DateOfBirthPicker from '../../component/ui/DateOfBirthPicker';
+import { useAuth } from '../../context/AuthContext';
 const RegisterPage = () => {
+    const navigate = useNavigate()
+    const apiUrl = import.meta.env.VITE_API_URL
+    const { user } = useAuth()
     const [sername, setSername] = useState('')
     const [name, setName] = useState('')
     const [dob, setDob] = useState()
@@ -25,10 +29,38 @@ const RegisterPage = () => {
     const [currentMedical, setCurrentMedical] = useState('')
     const [medicalHistory, setMedicalHistory] = useState('')
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         // Handle form submission here
-        alert("Cập nhật thông tin bệnh nhân thành công !")
+        try {
+            const response = await axios.post(`${apiUrl}/api/patient/register/${user._id}`, {
+                "sername": sername,
+                "name": name,
+                "phoneNumber": phoneNumber,
+                "dateOfBirth": dob,
+                "gender": gender,
+                "identificationNumber": identificationNumber,
+                'bloodType': bloodType,
+                "address": address,
+                "addressCity": addressCity,
+                "addressDistrict": addressDistrict,
+                "contactName": contactName,
+                "contactPhoneNumber": contactPhoneNumber,
+                "contactRelationship": contactRelationship,
+                "height": height,
+                "allergy": allergy,
+                "currentMedical": currentMedical,
+                "medicalHistory": medicalHistory,
+                "zipCode": zipCode
+            })
+            if (response.status == 200) {
+                alert("Đăng ký thông tin bệnh nhân thành công !")
+                navigate('/')
+            }
+            alert(response.data.message)
+        } catch (error) {
+            alert(error.message)
+        }
     }
 
     return (
