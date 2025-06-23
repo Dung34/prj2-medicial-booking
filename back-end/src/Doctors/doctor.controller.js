@@ -265,6 +265,14 @@ const getDoctorByUserId = async (req, res) => {
         return res.status(500).send({ "message": error })
     }
 }
+const getDoctorNotVerified = async (req, res) => {
+    try {
+        const doctors = await Doctor.find({ isVerified: false })
+        return res.status(200).send({ "message": "Lay thong tin bac si thanh cong !", "data": doctors })
+    } catch (error) {
+        return res.status(500).send({ "message": error })
+    }
+}
 module.exports = {
     registerDoctor,
     getAllDoctors,
@@ -278,5 +286,6 @@ module.exports = {
     getDoctorProfileImage,
     getEduAndCert,
     updateEduAndCert,
-    getDoctorByUserId
+    getDoctorByUserId,
+    getDoctorNotVerified
 } 

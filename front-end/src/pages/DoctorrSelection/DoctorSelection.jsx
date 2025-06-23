@@ -49,19 +49,30 @@ const DoctorSelection = () => {
     useEffect(() => {
         const getDoctors = async (speciality_id) => {
             try {
-                const response = await axios.get(`http://localhost:3000/speciality/getDocBySpecialityName/${speciality_id}`)
-                if (response.status === 200) {
-                    setDoctorsList(response.data)
+                if (speciality_id === "all") {
+                    const response = await axios.get(`http://localhost:3000/api/doctor/`)
+                    if (response.status == 200) {
+                        setDoctorsList(response.data)
 
-                    console.log(response.data[0].availableTime)
+                        console.log(response.data[0].availableTime)
+                    }
+                } else {
+                    const response = await axios.get(`http://localhost:3000/speciality/getDocBySpecialityName/${speciality_id}`)
+                    if (response.status == 200) {
+                        setDoctorsList(response.data)
+
+                        console.log(response.data[0].availableTime)
+                    }
                 }
 
-                else {
-                    setNotification("Không tìm thấy bác sĩ nào")
-                    setTimeout(() => {
-                        setNotification(null)
-                    }, 2000)
-                }
+
+
+                // else {
+                //     setNotification("Không tìm thấy bác sĩ nào")
+                //     setTimeout(() => {
+                //         setNotification(null)
+                //     }, 2000)
+                // }
             } catch (error) {
                 console.error('Error:', error)
                 setError("Không tìm thấy bác sĩ nào")

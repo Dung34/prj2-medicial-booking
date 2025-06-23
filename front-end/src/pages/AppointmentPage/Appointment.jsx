@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 const Appointment = () => {
     const navigate = useNavigate();
     const { doctor_id } = useParams();
     const [doctor, setDoctor] = useState({});
-    // const [patient, setPatient] = useState({});
+    const [patient, setPatient] = useState({});
     // const [note, setNote] = useState('');
     // const [date, setDate] = useState('');
     // const [time, setTime] = useState('');
     const [registerSuccess, setRegisterSuccess] = useState(false);
     // const [error, setError] = useState(null);
-    const patient_id = localStorage.getItem('id');
+    const { user } = useAuth();
     const headers = {
         Authorization: `${localStorage.getItem('token')}`,
     };
@@ -22,12 +23,18 @@ const Appointment = () => {
             try {
 
                 const doctorRes = await axios.get(`http://localhost:3000/api/doctor/get-doctor/${doctor_id}`, { headers: headers });
+                const patientRes = await axios.get(`http://localhost:3000/api/patient/user/${user._id}`, { headers: headers });
                 if (doctorRes.status !== 200) {
                     throw new Error('Xảy ra lỗi khi tải dữ liệu bác sĩ !!');
 
                 }
+                if (patientRes.status !== 200) {
+                    throw new Error('Xảy ra lỗi khi tải dữ liệu bệnh nhân !!');
+
+                }
                 setDoctor(doctorRes.data);
-                console.log(doctorRes.data);
+                setPatient(patientRes.data.data);
+                console.log(patientRes.data.data);
 
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -38,10 +45,11 @@ const Appointment = () => {
     }, [doctor_id]);
 
     const registerAppointment = async (e) => {
+
         e.preventDefault(); // Prevent default form submission
         try {
             const appointment = await axios.post(`http://localhost:3000/appointment/register`, {
-                "patient_id": patient_id,
+                "patient_id": patient._id,
                 "doctor_id": doctor_id,
                 "date": date,
                 "time": time,
@@ -59,8 +67,7 @@ const Appointment = () => {
                 }, 3000);
             }
         } catch (err) {
-            console.error('Error registering appointment:', err);
-            setError('Failed to register appointment.');
+            console.log(err)
         }
     };
 

@@ -133,6 +133,22 @@ const deleteEMRById = async (req, res) => {
         res.status(500).send({ "meassage": error })
     }
 }
+
+const getEMRByPatientId = async (req, res) => {
+    try {
+        const { patient_id } = req.params;
+        // Find all appointments for this patient
+        const appointments = await Appointment.find({ patient_id });
+        const appointmentIds = appointments.map(app => app._id);
+        // Find all EMRs linked to these appointments
+        const emrs = await EMR.find({ appoinment_id: { $in: appointmentIds } });
+        res.status(200).send(emrs);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ "message": error });
+    }
+}
+
 module.exports = {
     createEMR,
     getAllEMR,
@@ -142,4 +158,5 @@ module.exports = {
     deleteEMRById,
     uploadEmrImage,
     getImageByAppId,
+    getEMRByPatientId,
 }

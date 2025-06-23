@@ -5,7 +5,11 @@ const Doctor = require('../Doctors/doctor.model')
 const User = require('../Model/user.model')
 const router = express.Router()
 
+// JWT secrets from environment variables
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access_secret_key'
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refresh_secret_key'
 
+// Login endpoint
 router.post('/', async (req, res) => {
     const { email, password, role } = req.body
     try {
@@ -13,71 +17,118 @@ router.post('/', async (req, res) => {
         if (!user) {
             return res.status(404).send({ "message": "Hiện không thấy người dùng này !!!" })
         }
-        else {
-            if (password === user.password) {
-                const accessToken = jwt.sign({ user }, 'access', { expiresIn: '15m' })
-                const refreshToken = jwt.sign({ user }, 'refresh', { expiresIn: '7d' })
-                return res.status(200).send({
-                    "message": "Đăng nhập thành công !",
-                    "data": {
-                        "accessToken": accessToken,
-                        "refreshToken": refreshToken,
-                        "role": user.role,
-                        "userId": user._id
-                    }
-                })
-            }
+
+        if (password === user.password) {
+            // Create tokens
+            const accessToken = jwt.sign(
+                { userId: user._id, email: user.email, role: user.role },
+                ACCESS_TOKEN_SECRET,
+                { expiresIn: '15m' }
+            )
+            const refreshToken = jwt.sign(
+                { userId: user._id, email: user.email, role: user.role },
+                REFRESH_TOKEN_SECRET,
+                { expiresIn: '7d' }
+            )
+
+            // Set refresh token in httpOnly cookie
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            })
+
+            return res.status(200).send({
+                "message": "Đăng nhập thành công !",
+                "data": {
+                    "accessToken": accessToken,
+                    "role": user.role,
+                    "userId": user._id,
+                    "user": user
+                }
+            })
+        } else {
+            return res.status(401).send({ "message": "Mật khẩu không đúng !!!" })
         }
     } catch (error) {
-        return res.status(500).send({ "message": error })
         console.log(error)
+        return res.status(500).send({ "message": "Internal server error" })
     }
-    // if (email == "admin" && password == "admin") {
-    //     const accessToken = jwt.sign({ email: 'admin', role: 'admin' }, 'secret', { expiresIn: '15m' })
-    //     const refreshToken = jwt.sign({ email: 'admin', role: 'admin' }, 'refresh', { expiresIn: '7d' })
-    //     res.status(200).send({
-    //         "accessToken": accessToken,
-    //         "refreshToken": refreshToken,
-    //         "role": "admin",
-    //         "id": 'ADMIN'
-    //     })
-    // } else {
-    //     const patient = await Patient.findOne({ email })
-    //     if (patient) {
-    //         if (patient.password === password) {
-    //             // generate token
-    //             const accessToken = jwt.sign({ email: patient.email, role: 'patient' }, 'secret', { expiresIn: '15m' })
-    //             const refreshToken = jwt.sign({ email: patient.email, role: 'patient' }, refresh, { expiresIn: '7d' })
-    //             res.status(200).send({ "accessToken": accessToken, "refreshToken": refreshToken, "role": "patient", "id": patient._id })
-    //             console.log("Patient logged in successfully")
-    //         }
-    //         else {
-    //             res.status(401).send({ "message": "Wrong password" })
-    //         }
-    //         // if valid, generate toke
-    //     }
-    //     else {
-    //         const doctor = await Doctor.findOne({ email })
-    //         if (doctor) {
-    //             if (doctor.password === password) {
-    //                 // generate token
-    //                 const accessToken = jwt.sign({ email: doctor.email, role: 'doctor' }, 'secret', { expiresIn: '15m' })
-    //                 const refreshToken = jwt.sign({ email: doctor.email, role: 'doctor' }, refresh, { expiresIn: '7d' })
-    //                 res.status(200).send({ "accessToken": accessToken, "refreshToken": refreshToken, "role": "doctor", "id": doctor._id })
-    //             } else {
-    //                 res.status(401).send({ "message": "Sai mật khẩu" })
-    //             }
-    //         } else {
-    //             res.status(401).send({ "message": "Không tìm thấy người dùng" })
-    //         }
+})
 
-    //     }
-    // }
-    // // check if email and password are valid
+// Refresh token endpoint
+router.post('/refresh', async (req, res) => {
+    const { refreshToken } = req.cookies
 
-}
-)
+    if (!refreshToken) {
+        return res.status(401).send({ "message": "Refresh token not found" })
+    }
 
+    try {
+        // Verify refresh token
+        const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET)
+
+        // Check if user still exists
+        const user = await User.findById(decoded.userId)
+        if (!user) {
+            return res.status(401).send({ "message": "User not found" })
+        }
+
+        // Generate new access token
+        const newAccessToken = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        )
+
+        // Generate new refresh token
+        const newRefreshToken = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role },
+            REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        // Set new refresh token in cookie
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        })
+
+        return res.status(200).send({
+            "message": "Token refreshed successfully",
+            "data": {
+                "accessToken": newAccessToken,
+                "role": user.role,
+                "userId": user._id
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(401).send({ "message": "Invalid refresh token" })
+    }
+})
+
+// Logout endpoint
+router.post('/logout', async (req, res) => {
+    try {
+        // Clear the refresh token cookie
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        })
+
+        return res.status(200).send({ "message": "Đăng xuất thành công !" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ "message": "Internal server error" })
+    }
+})
+
+// Register endpoint
 router.post('/signIn', async (req, res) => {
     const { email, password, role } = req.body
     try {
@@ -90,13 +141,10 @@ router.post('/signIn', async (req, res) => {
             await newUser.save()
             return res.status(200).send({ message: "Đăng ký người dùng thành công !!!", "data": newUser })
         }
-
-
     } catch (error) {
         console.log(error)
         return res.status(500).send({ "message": error })
     }
 })
-
 
 module.exports = router

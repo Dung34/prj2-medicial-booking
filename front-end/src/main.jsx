@@ -19,7 +19,14 @@ import DoctorEdit from './pages/DoctorProfile/DoctorEdit.jsx'
 import EMRPage from './pages/EMR/EMRPage.jsx'
 import EMREdit from './pages/EMR/EMREdit.jsx'
 import RegisterPageVer2 from './pages/RegisterPage/RegisterPageVer2.jsx'
+import ProtectedRoute from './component/ProtectedRoute.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import MyAppointments from './pages/MyAppointments/MyAppointments.jsx'
+import MyEMR from './pages/MyEMR/MyEMR.jsx'
+import EditPatientInfo from './pages/RegisterPage/EditPatientInfo.jsx'
+import DoctorRegister from './pages/DoctorProfile/DoctorRegister.jsx'
+import DoctorNotVerified from './pages/AppointmentDashboard/DoctorNotVerified.jsx'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -40,31 +47,95 @@ const router = createBrowserRouter([
   },
   {
     path: '/appointment/:doctor_id',
-    element: <Appointment />
+    element: (
+      <ProtectedRoute>
+        <Appointment />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/dashboard',
-    element: <AppointmentDashboard />
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AppointmentDashboard />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/dashboard/edit',
-    element: <DoctorEdit />
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <DoctorEdit />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/dashboard/register',
-    element: <DoctorProfileUpload />
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <RegisterDoctorForm />
+      </ProtectedRoute>
+    )
   },
   {
-    path: '/doctor/dashboard',
-    element: <DoctorDashboard />
+    path: '/dashboard/not-verified-doctors',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <DoctorNotVerified />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/doctor-dashboard',
+    element: (
+      <ProtectedRoute allowedRoles={['doctor']}>
+        <DoctorDashboard />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/emr/:appId',
-    element: <EMRPage />
+    element: (
+      <ProtectedRoute allowedRoles={['doctor', 'patient']}>
+        <EMRPage />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/emr/edit/:emrId',
-    element: <EMREdit />
+    element: (
+      <ProtectedRoute allowedRoles={['doctor']}>
+        <EMREdit />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/my-appointments',
+    element: (
+      <ProtectedRoute allowedRoles={['patient']}>
+        <MyAppointments />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/my-emr',
+    element: (
+      <ProtectedRoute allowedRoles={['patient']}>
+        <MyEMR />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/edit-patient-info',
+    element: (
+      <ProtectedRoute allowedRoles={['patient']}>
+        <EditPatientInfo />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/register-doctor',
+    element: <DoctorRegister />
   }
 ])
 
@@ -73,6 +144,5 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-
   </React.StrictMode>
 )

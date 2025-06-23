@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import { CiUser, CiPhone, CiHeart } from "react-icons/ci";
 import DateOfBirthPicker from '../../component/ui/DateOfBirthPicker';
 import { useAuth } from '../../context/AuthContext';
+import Cookies from 'js-cookie'
 const RegisterPage = () => {
     const navigate = useNavigate()
     const apiUrl = import.meta.env.VITE_API_URL
-    const { user } = useAuth()
+    const { user, registerUser } = useAuth()
+
     const [sername, setSername] = useState('')
     const [name, setName] = useState('')
     const [dob, setDob] = useState()
@@ -28,12 +30,41 @@ const RegisterPage = () => {
     const [allergy, setAllergy] = useState('')
     const [currentMedical, setCurrentMedical] = useState('')
     const [medicalHistory, setMedicalHistory] = useState('')
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
 
+    useEffect(() => {
+        console.log(user)
+    }, [])
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        // Handle form submission here
+        e.preventDefault();
+        setError('');
+        setSuccess(false);
+        if (password !== confirmPassword) {
+            setError('Mật khẩu không trùng khớp.');
+            return;
+        }
         try {
-            const response = await axios.post(`${apiUrl}/api/patient/register/${user._id}`, {
+            // 1. Register patient account using AuthContext
+            const result = await registerUser(email, password, 'patient', true);
+            if (!result.success) {
+                setError(result.message);
+                return;
+            }
+            // Get userId from result or refetch if needed
+            let userId = null;
+            if (result.user && result.user._id) {
+                userId = result.user._id;
+            } else {
+                // fallback: fetch user by email (should not be needed if context is correct)
+                const userRes = await axios.get(`${apiUrl}/api/patient/user-by-email/${email}`);
+                userId = userRes.data._id;
+            }
+            // 2. Register patient profile
+            const response = await axios.post(`${apiUrl}/api/patient/register/${userId}`, {
                 "sername": sername,
                 "name": name,
                 "phoneNumber": phoneNumber,
@@ -52,14 +83,15 @@ const RegisterPage = () => {
                 "currentMedical": currentMedical,
                 "medicalHistory": medicalHistory,
                 "zipCode": zipCode
-            })
-            if (response.status == 200) {
-                alert("Đăng ký thông tin bệnh nhân thành công !")
-                navigate('/')
+            });
+            if (response.status === 200) {
+                setSuccess(true);
+                setTimeout(() => navigate('/'), 2000);
+            } else {
+                setError(response.data.message);
             }
-            alert(response.data.message)
         } catch (error) {
-            alert(error.message)
+            setError(error.response?.data?.message || 'Đăng ký thất bại.');
         }
     }
 
@@ -360,6 +392,13 @@ const RegisterPage = () => {
                         chăm sóc y tế tốt nhất.
                     </p>
                 </div>
+
+                {error && (
+                    <div className="bg-red-100 text-red-700 p-2 rounded mb-2 text-center">{error}</div>
+                )}
+                {success && (
+                    <div className="bg-green-100 text-green-700 p-2 rounded mb-2 text-center">Đăng ký thành công! Chuyển hướng đến trang chủ...</div>
+                )}
             </div>
         </div>
     )

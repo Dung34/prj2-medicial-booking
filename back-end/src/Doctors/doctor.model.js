@@ -22,10 +22,6 @@ const doctorSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        password: {
-            type: String,
-            required: true
-        },
         address: {
             type: String,
             require: true,
@@ -42,6 +38,10 @@ const doctorSchema = new mongoose.Schema(
         speciality_id: {
             type: String,
             require: true
+        },
+        isVerified: {
+            type: Boolean,
+            default: false
         }
     }
 )

@@ -12,7 +12,8 @@ const { registerDoctor,
     getDoctorProfileImage,
     getEduAndCert,
     updateEduAndCert,
-    getDoctorByUserId
+    getDoctorByUserId,
+    getDoctorNotVerified
 } = require('./doctor.controller')
 const verifyToken = require('../Auth/verifyToken')
 const uploadToCloud = require('../Midlleware/multer')
@@ -21,8 +22,8 @@ const router = express.Router()
 
 router.post('/register', registerDoctor)
 
-router.get('/', verifyToken, getAllDoctors)
-
+router.get('/', getAllDoctors)
+router.get('/not-verified', getDoctorNotVerified)
 router.get('/get-doctor/:id', getDoctorById)
 
 router.get('/user/:userId', getDoctorByUserId)

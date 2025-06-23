@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { CiUser, CiPhone, CiMail, CiMap, CiLock } from "react-icons/ci";
-import { FaCheck, FaKey } from "react-icons/fa6";
+import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { IoKeyOutline } from "react-icons/io5";
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 const DoctorRegistrationForm = () => {
     const [specialities, setSpecialities] = useState([])
     const [selectedId, setSelectId] = useState('')
@@ -15,6 +18,9 @@ const DoctorRegistrationForm = () => {
     const [address, setAddress] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [success, setSuccess] = useState(false);
+    const { registerUser } = useAuth();
+    const navigate = useNavigate();
     const handleSelect = (e) => {
         setSelectId('')
         setSelectId(e.target.value)
@@ -27,48 +33,77 @@ const DoctorRegistrationForm = () => {
                 const response = await axios.get(`${apiUrl}/speciality`)
                 if (response.status == 200) {
                     setSpecialities(response.data)
-                    console.log(response.data)
                 }
                 else {
-                    setError(''),
-                        setError("Khong tim thay chuyen khoa nao")
+                    setError("Không tìm thấy chuyên khoa nào")
                 }
             } catch (error) {
-                setError('')
-                setError(error)
-                console.log(error)
+                setError("Không thể tải chuyên khoa")
             }
         }
         getSpecialities()
     }, [])
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setError('');
         if (!isMatch) {
-            alert("Mật khẩu khong trùng khớp")
+            setError("Mật khẩu không trùng khớp")
             return
-        } else {
-            const response = await axios.post(`${apiUrl}/api/doctor/register`, {
-                fullname: fullname,
-                phoneNumber: phoneNumber,
-                email: email,
-                password: password,
-                address: address,
-                speciality_id: selectedId,
-            })
-            if (response.status == 200) {
-                alert("Đăng ký thành công !")
-            }
-            if (response.status == 400) {
-                alert("Trùng một cái gì đấy")
-            }
         }
+        try {
+            // 1. Register doctor account using AuthContext
+            const result = await axios.post(`${apiUrl}/login/signIn`, {
+                email,
+                password,
+                role: 'doctor',
+            });
+            if (result.status !== 200) {
+                setError(result.data.message);
+                return;
+            }
+            const userId = result.data.data._id;
 
+            // 2. Register doctor profile
+            const profileRes = await axios.post(`${apiUrl}/api/doctor/register`, {
+                fullname,
+                phoneNumber,
+                email,
+                address,
+                speciality_id: selectedId,
+                userId,
+                isVerified: true
+            });
+            if (profileRes.status === 200) {
+                setSuccess(true);
+                setFullname('');
+                setPhoneNumber('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+                setAddress('');
+                setSelectId('');
+                setTimeout(() => {
+                    setSuccess(false);
+                    navigate('/dashboard');
+                }, 1500);
+            } else {
+                setError(profileRes.data.message);
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "Đăng ký thất bại!");
+        }
     }
     return (
         <div className=''>
             <div className='w-1/3 mx-auto border border-gray-400 rounded-2xl p-4 my-[5vh]'>
-                <h3 className='font-sans font-bold text-3xl'>Đăng ký bác sĩ</h3>
-                <form action="sumbit" onSubmit={(e) => handleSubmit(e)}>
+                <h3 className='font-sans font-bold text-3xl'>Đăng ký bác sĩ (Chỉ dành cho Admin)</h3>
+                {error && (
+                    <div className="bg-red-100 text-red-700 p-2 rounded mb-2 text-center">{error}</div>
+                )}
+                {success && (
+                    <div className="bg-green-100 text-green-700 p-2 rounded mb-2 text-center">Đăng ký thành công!</div>
+                )}
+                <form action="sumbit" onSubmit={handleSubmit}>
                     <div>
                         <p className='font-sans font-medium text-xl mt-3 mb-2'>Họ và tên</p>
                         <div className='flex flex-row gap-3 items-center'>
@@ -127,7 +162,6 @@ const DoctorRegistrationForm = () => {
                             <div className='flex flex-row gap-3 items-center'>
                                 <CiLock className='size-6' />
                                 <input className='border border-gray-300 rounded-md bg-white w-full px-2 py-2'
-
                                     type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                                     name="password" id="password" />
                             </div>

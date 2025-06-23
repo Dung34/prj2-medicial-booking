@@ -5,6 +5,7 @@ import axios from 'axios'
 import AppointmentDetail from '../../component/AppointmentDetail/AppointmentDetail';
 import Navbar from '../../component/Navbar/Navbar'
 import DoctorManagement from './DoctorManagement'
+import { Link } from 'react-router-dom'
 const AppointmentDashboard = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [selectedAppointment, setSelectedAppointment] = useState(null)
@@ -55,6 +56,20 @@ const AppointmentDashboard = () => {
     return (
         <div className='flex flex-col bg-white'>
             <Navbar />
+            <div className="flex justify-end p-4 gap-2">
+                <Link
+                    to="/dashboard/not-verified-doctors"
+                    className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition"
+                >
+                    Bác sĩ chưa xác thực
+                </Link>
+                <Link
+                    to="/dashboard/register"
+                    className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition"
+                >
+                    + Đăng ký bác sĩ mới
+                </Link>
+            </div>
             <TabGroup>
                 <TabList className='flex bg-gray-200 px-4 py-2 w-fit space-x-2 rounded-md mb-4 mx-2'>
                     <Tab className='bg-gray-200 text-gray-600 data-[selected]:bg-white data-[selected]:text-black outline-0 py-2 px-2'>Tổng quan</Tab>
