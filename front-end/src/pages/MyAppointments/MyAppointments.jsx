@@ -30,7 +30,7 @@ const MyAppointments = () => {
             }
         };
         fetchAppointments()
-    }, []);
+    }, [refresh]);
 
     const handleCancel = async (appointmentId) => {
         if (!window.confirm('Bạn có chắc muốn hủy lịch hẹn này?')) return;

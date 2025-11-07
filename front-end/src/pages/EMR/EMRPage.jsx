@@ -24,6 +24,7 @@ const EMRPage = () => {
                     if (patientData.status == 200) {
                         setPatient(patientData.data)
                     }
+
                 }
             } catch (error) {
 
@@ -49,7 +50,7 @@ const EMRPage = () => {
                 if (appointSuccess.status == 200) {
                     console.log("Hoàn thành ca bệnh !!")
                     setTimeout(() => {
-                        navigate('/doctor/dashboard')
+                        navigate('/doctor-dashboard')
                     })
                 }
             }
@@ -61,7 +62,7 @@ const EMRPage = () => {
         const files = Array.from(e.target.files); // chuyển FileList thành Array
         const newImages = files.map(file => ({
             file,
-            preview: URL.createObjectURL(file)
+            url: URL.createObjectURL(file)
         }));
 
         // Gộp ảnh mới với ảnh cũ nếu cần
@@ -73,10 +74,32 @@ const EMRPage = () => {
             const updated = prev.filter(img => img.id !== id);
             // Hủy URL để giải phóng bộ nhớ
             const deleted = prev.find(img => img.id === id);
-            if (deleted) URL.revokeObjectURL(deleted.preview);
+            if (deleted) URL.revokeObjectURL(deleted.url);
             return updated;
         });
     }
+    const [files, setFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        setFiles([...e.target.files]);
+    };
+
+    const handleUpload = async () => {
+        const formData = new FormData();
+        files.forEach((file) => formData.append("images", file)); // "images" là key backend mong đợi
+
+        try {
+            const res = await axios.post(`http://localhost:3000/emr/uploadImage/${appId}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            alert("Upload thành công!");
+            console.log(res.data);
+        } catch (err) {
+            console.error("Lỗi upload:", err);
+        }
+    };
     return (
         <div>
             <Navbar />
@@ -86,7 +109,7 @@ const EMRPage = () => {
                 </div>
                 <div className='flex flex-row gap-4'>
                     <div className='border border-gray-400 rounded-2xl px-4 py-2 h-fit'>
-                        <p className='font-mono'>Họ và tên: {patient.fullname}</p>
+                        <p className='font-mono'>Họ và tên: {patient.sername} {patient.name}</p>
                         <p className='font-mono'>Số điện thoại: {patient.phoneNumber}</p>
                         <p className='font-mono'>Email: {patient.email}</p>
                         <p className='font-mono'>Địa chỉ: {patient.address}</p>
@@ -115,46 +138,15 @@ const EMRPage = () => {
                             <button className='border border-gray-500 px-2 py-1 font-mono rounded-md mt-3 hover:bg-gray-200' onClick={(e) => handleClick(emr)}>Tạo bệnh án</button>
                         </div>
                         <div className="p-4">
-                            {/* Ẩn input gốc */}
-                            <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                ref={fileInputRef}
-                                className="hidden"
-                                onChange={handleMultiImagesChange}
-                            />
 
-                            {/* Nút tùy chỉnh để kích hoạt input */}
-                            <button
-                                onClick={() => fileInputRef.current.click()}
-                                className="border border-gray-500 px-2 py-1 font-mono rounded-md mt-3 hover:bg-gray-200"
-                            >
-                                Chọn ảnh
-                            </button>
+                            <div>
+                                <input type="file" multiple onChange={handleFileChange} />
+                                <button onClick={handleUpload} className='hover:bg-gray-300'>Upload</button>\
+                                {Array.isArray(files) && files.map((file, index) => (
+                                    <img key={index} src={URL.createObjectURL(file)} />
+                                ))}
+                            </div>
 
-                            {images.length > 0 && (
-                                <>
-                                    <p className="mt-4 font-semibold">Ảnh đã chọn:</p>
-                                    <div className="flex flex-wrap gap-4 mt-2">
-                                        {images.map((img, index) => (
-                                            <div key={img.id} className="relative w-32 h-32 border rounded overflow-hidden">
-                                                <img
-                                                    src={img.preview}
-                                                    alt={`Ảnh ${index + 1}`}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <button
-                                                    onClick={() => handleDelete(img.id)}
-                                                    className="absolute top-1 right-1 bg-gray-300 text-black text-xs px-1 rounded"
-                                                >
-                                                    X
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
                         </div>
                     </div>
                 </div>

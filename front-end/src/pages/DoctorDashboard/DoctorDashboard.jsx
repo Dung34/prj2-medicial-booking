@@ -7,13 +7,14 @@ import Navbar from '../../component/Navbar/Navbar'
 import DoctorProfile from '../DoctorProfile/DoctorProfile'
 import { CiCalendar, CiUser, CiSearch } from "react-icons/ci";
 import ListEmr from '../EMR/ListEmr'
+import { useAuth } from '../../context/AuthContext'
 const DoctorDashboard = () => {
     const [appointments, setAppointments] = useState([])
     const [selectAppoint, setSelectAppoint] = useState({})
     const [isSelect, setIsSelect] = useState(false)
     const [successAppointment, setSuccessAppointment] = useState([])
     const [notsuccessAppointment, setNotsuccessAppointment] = useState([])
-
+    const { user } = useAuth()
     const [status, setStatus] = useState('')
     const [patientId, setPatientId] = useState('')
     const [doctor, setDoctor] = useState({})
@@ -28,8 +29,12 @@ const DoctorDashboard = () => {
     useEffect(() => {
         const getData = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/appointment/doctor/${doctorId}`)
-                const doctorRes = await axios.get(`${apiUrl}/api/doctor/get-doctor/${doctorId}`)
+                const doctorRes = await axios.get(`${apiUrl}/api/doctor/user/${user._id}`)
+                if (doctorRes.status == 200) {
+                    setDoctor(doctorRes.data.data)
+                }
+                const response = await axios.get(`${apiUrl}/appointment/doctor/${doctorRes.data.data._id}`)
+
                 const success = []
                 const notSuccess = []
                 if (response.status == 200) {

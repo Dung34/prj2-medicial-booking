@@ -18,29 +18,35 @@ const createEMR = async (req, res) => {
 }
 const uploadEmrImage = async (req, res) => {
     try {
-        const { id } = req.params
-        const appointment = await Appointment.findById(id)
+        const { id } = req.params;
+        const appointment = await Appointment.findById(id);
         if (!appointment) {
-            return res.status(404).send({ "message": "Khong tim thay lich hen nao" })
-
+            return res.status(404).send({ message: "Không tìm thấy lịch hẹn nào" });
         }
-        let imageUrl = []
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const newImage = new emrImageModel({
-                    url: file.path,
-                    appointment_id: id
-                })
-                await newImage.save()
 
-            }
-            return res.status(200).send({ 'message': "Upload anh thanh cong !!" })
+        if (req.files && req.files.length > 0) {
+            // Lấy đường dẫn file đã upload
+            const imageUrls = req.files.map(file => file.path);
+
+            const newImage = new emrImageModel({
+                appointment_id: id,
+                urls: imageUrls
+            });
+
+            await newImage.save();
+
+            return res.status(200).send({
+                message: "Upload ảnh thành công!",
+                data: newImage
+            });
+        } else {
+            return res.status(400).send({ message: "Không có file nào được gửi lên." });
         }
     } catch (error) {
-        console.log(error)
-        res.status(500).send({ "meassage": error })
+        console.log(error);
+        res.status(500).send({ message: "Lỗi server", error });
     }
-}
+};
 
 const getImageByAppId = async (req, res) => {
     try {

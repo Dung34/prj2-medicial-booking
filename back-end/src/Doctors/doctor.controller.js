@@ -23,6 +23,25 @@ const uploadImage = async (req, res) => {
         res.status(500).json({ "error": 'Lỗi upload ảnh' });
     }
 }
+const editImageProfile = async (req, res) => {
+    try {
+        const image = req.file
+        if (!req.file) {
+            return res.status(404).json({ 'message': "Không tìm thấy file upload" })
+        }
+        const { doctor_id } = req.query
+        const oldImage = await Image.findOneAndDelete({ doctor_id: doctor_id })
+        const newImage = new Image({
+            url: image.path,
+            doctor_id: doctor_id,
+        })
+        await newImage.save()
+        res.status(200).json(newImage)
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ "error": 'Lỗi upload ảnh' });
+    }
+}
 const registerDoctor = async (req, res) => {
     const { fullname, phoneNumber, email, password, address, speciality_id } = req.body
     try {
@@ -287,5 +306,6 @@ module.exports = {
     getEduAndCert,
     updateEduAndCert,
     getDoctorByUserId,
-    getDoctorNotVerified
+    getDoctorNotVerified,
+    editImageProfile,
 } 

@@ -1,26 +1,23 @@
 const mongoose = require('mongoose')
 
 const certification = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true,
     },
-    address: {
-        type: String,
-        required: true,
-    },
-    year: {
+
+    time: {
         type: String,
         required: true,
     }
 })
 
 const educationSchema = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
         required: true,
     },
-    time: {
+    year: {
         type: String,
         required: true,
     }

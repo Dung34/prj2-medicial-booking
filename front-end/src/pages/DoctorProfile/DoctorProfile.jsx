@@ -4,59 +4,12 @@ import { CiMail, CiPhone, CiMap, CiEdit, CiCalendar, CiUser } from "react-icons/
 import { FaUserGraduate } from "react-icons/fa6";
 import { GrCertificate } from "react-icons/gr";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 const languages = [
     "Tiếng Anh", "Tiếng Pháp", "Tiếng Trung"
 ]
-const educations = [
-    {
-        "title": "Bác sĩ nội trú Bệnh viện Bạch Mai",
-        "time": "2003-2006"
-    },
-    {
-        "title": "Giảng viên trường Đại học Y Hà Nội",
-        "time": "2006-2016"
-    },
-    {
-        "title": "Trưởng khoa Nội tổng hợp - Bệnh viện Đại học Y",
-        "time": "2016-2020"
-    },
-    {
-        "title": "Chuyên gia tư vấn y khoa tại Bộ Y tế",
-        "time": "2020-nay"
-    }
-]
-const certifications = [
-    {
-        "id": 1,
-        "tên": "Bằng Bác sĩ Đa khoa",
-        "tên cơ quan cấp": "Đại học Y Hà Nội",
-        "năm cấp": 2003
-    },
-    {
-        "id": 2,
-        "tên": "Chứng chỉ Nội trú chuyên ngành Nội tổng hợp",
-        "tên cơ quan cấp": "Bệnh viện Bạch Mai",
-        "năm cấp": 2006
-    },
-    {
-        "id": 3,
-        "tên": "Chứng chỉ hành nghề khám bệnh, chữa bệnh",
-        "tên cơ quan cấp": "Bộ Y tế",
-        "năm cấp": 2007
-    },
-    {
-        "id": 4,
-        "tên": "Chứng chỉ đào tạo liên tục về tim mạch",
-        "tên cơ quan cấp": "Trường Đại học Y Dược TP.HCM",
-        "năm cấp": 2015
-    },
-    {
-        "id": 5,
-        "tên": "Chứng chỉ đào tạo quản lý bệnh viện",
-        "tên cơ quan cấp": "Trường Đại học Y tế Công cộng",
-        "năm cấp": 2019
-    }
-]
+
 const todayPerformance = {
     "todayAppointments": 8,
     "isSuccess": 3,
@@ -87,24 +40,39 @@ const scheduleData = {
     lastUpdated: "April 10, 2025",
 };
 const DoctorProfile = () => {
+    const { user } = useAuth()
     const [doctor, setDoctor] = useState({})
     const [error, setError] = useState('')
     const apiUrl = import.meta.env.VITE_API_URL
     const doctor_id = localStorage.getItem('id')
     const token = localStorage.getItem('token')
+    const [urlImage, setUrlImage] = useState('')
+    const navigate = useNavigate()
+    const [educations, setEducations] = useState([])
+    const [certifications, setCertifications] = useState([])
     useEffect(() => {
 
         const getData = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/api/doctor/get-doctor/${doctor_id}`, {
+                const response = await axios.get(`${apiUrl}/api/doctor/user/${user._id}`, {
                     headers: {
                         Authorization: token
                     }
                 })
                 if (response.status == 200) {
                     setDoctor({})
-                    setDoctor(response.data)
-                    console.log(response.data)
+                    setDoctor(response.data.data)
+                    console.log(response.data.data)
+                }
+                const urlRes = await axios.get(`${apiUrl}/api/doctor/profile-image?doctor_id=${response.data.data._id}`)
+                if (urlRes.status == 200) {
+                    setUrlImage(urlRes.data.imageUrl)
+                    console.log(urlRes.data.imageUrl)
+                }
+                const eduAndCert = await axios.get(`${apiUrl}/api/doctor/eduAndCert?doctor_id=${response.data.data._id}`)
+                if (eduAndCert.status == 200) {
+                    setEducations(eduAndCert.data.eduAndCert.educations || [])
+                    setCertifications(eduAndCert.data.eduAndCert.certifications || [])
                 }
                 else {
                     setDoctor({})
@@ -129,12 +97,12 @@ const DoctorProfile = () => {
                         <div className='border border-gray-400 py-4 px-10 rounded-2xl'>
                             <div className='flex flex-row justify-between'>
                                 <p className='p-0 m-0 font-sans text-2xl text-black'>Thông tin cá nhân</p>
-                                <button ><CiEdit className='size-6 hover:text-green-600' /></button>
+                                <button onClick={() => navigate('/dashboard/edit')}><CiEdit className='size-6 hover:text-green-600' /></button>
                             </div>
 
 
                             <div className='flex flex-row justify-start items-center gap-8 mt-4'>
-                                <div><img className='size-20 rounded-full' src={'/Doctors/doctorProfile1.png'} alt={doctor.fullname} /></div>
+                                <div><img className='size-20 rounded-full' src={urlImage || null} alt={doctor.fullname} /></div>
                                 <div>
                                     <h2 className='p-0 m-0 font-sans text-black text-xl'>Bác sĩ {doctor.fullname}</h2>
                                     <p className='p-0 m-0 font-sans text-gray-400 text-[16px]'>Chuyên ngành</p>
@@ -179,10 +147,10 @@ const DoctorProfile = () => {
                                 <FaUserGraduate className='size-4 text-green-600' />
                                 <p className='font-sans font-medium text-[20px] p-0 m-0'>Trình độ học vấn</p>
                             </div>
-                            <div className='flex flex-col gap-2 items-start my-4'>{educations.map((education, index) => (
-                                <div className='' key={education.time + index}>
-                                    <p className='font-sans text-xl'>{education.title}</p>
-                                    <p className='font-sans text-[16px] font-light text-gray-400'>{education.time}</p>
+                            <div className='flex flex-col gap-2 items-start my-4'>{Array.isArray(educations) && educations.map((education, index) => (
+                                <div className='' key={education.year + index}>
+                                    <p className='font-sans text-xl'>{education.name}</p>
+                                    <p className='font-sans text-[16px] font-light text-gray-400'>{education.year}</p>
                                 </div>
                             ))}</div>
                             <hr />
@@ -193,10 +161,10 @@ const DoctorProfile = () => {
                                 <GrCertificate className='size-4 text-green-600' />
                                 <p className='font-sans font-medium text-[20px] p-0 my-2'>Bằng cấp, chứng chỉ</p>
                             </div>
-                            <div className='flex flex-col items-start gap-2'>{certifications.map((certification) => (
-                                <div key={certification.tên}>
-                                    <p className='font-sans text-xl'>{certification.tên}</p>
-                                    <p className='font-sans text-[16px] font-light text-gray-400'>{certification['tên cơ quan cấp']}, {certification['năm cấp']}</p>
+                            <div className='flex flex-col items-start gap-2'>{Array.isArray(certifications) && certifications.map((certification, index) => (
+                                <div key={certification.time + index}>
+                                    <p className='font-sans text-xl'>{certification.title}</p>
+                                    <p className='font-sans text-[16px] font-light text-gray-400'>{certification.time}</p>
                                 </div>
                             ))}</div>
                         </div>

@@ -31,7 +31,7 @@ const DoctorAppointItem = ({ appointment, handleClick, isSelected }) => {
             <td className='flex flex-row items-center gap-2'>
                 <CiUser className='size-6' />
                 <div className='flex flex-col items-start gap-0'>
-                    <p className='text-[16px] font-mono'>{patient.fullname}</p>
+                    <p className='text-[16px] font-mono'>{patient.sername} {patient.name}</p>
                     <p className='text-[14px] text-gray-400'>{patient.email}</p>
                 </div>
             </td>

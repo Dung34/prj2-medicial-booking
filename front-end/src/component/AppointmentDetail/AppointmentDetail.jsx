@@ -13,6 +13,8 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
     const [status, setStatus] = useState(appointment.status)
     const [showNotification, setShowNotification] = useState(false)
     const [notification, setNotification] = useState('')
+    const [date, setDate] = useState(appointment.date)
+    const [time, setTime] = useState(appointment.time);
     const token = localStorage.getItem('token')
     const apiUrl = import.meta.env.VITE_API_URL
     useEffect(() => {
@@ -25,7 +27,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
             if (patientRes.status === 200) {
                 setPatient(patientRes.data)
             }
-            const doctorRes = await axios.get(`${apiUrl}/api/doctor/${appointment.doctor_id}`, {
+            const doctorRes = await axios.get(`${apiUrl}/api/doctor/get-doctor/${appointment.doctor_id}`, {
                 headers: {
                     "Authorization": token
                 }
@@ -39,8 +41,10 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
     }, [])
     const updateStatus = async (status) => {
 
-        const response = await axios.put(`${apiUrl}/appointment/${appointment._id}`, {
-            "status": status
+        const response = await axios.post(`${apiUrl}/appointment/update/${appointment._id}`, {
+            "status": status,
+            "date": date,
+            "time": time,
         })
         if (response.status == 200) {
             setNotification("Điều chỉnh thành công")
@@ -99,7 +103,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <FaUser className="mt-1" />
                             <div>
                                 <p className="font-semibold">Bệnh nhân</p>
-                                <p>{patient.fullname || 'John Smith'}</p>
+                                <p>{patient.sername || ""} {patient.name}</p>
                                 <p>SĐT: {patient.phoneNumber}</p>
                             </div>
                         </div>
@@ -108,7 +112,7 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <FaUserMd className="mt-1" />
                             <div>
                                 <p className="font-semibold">Bác sĩ</p>
-                                <p>{doctor.fullname || 'Dr. Sarah Johnson'}</p>
+                                <p>{doctor.fullname}</p>
                                 <p className="text-sm text-gray-500">Email: {doctor.email}</p>
                             </div>
                         </div>
@@ -119,7 +123,18 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <FaCalendarAlt className="mt-1" />
                             <div>
                                 <p className="font-semibold">Ngày</p>
-                                <p>{appointment.date}</p>
+                                <input
+                                    type="date"
+                                    id="date"
+                                    value={date || ""}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    className="border rounded p-2"
+                                />
+
+                                {/* ✅ In giá trị ra bên dưới */}
+                                <p className="mt-4 text-gray-700">
+                                    Ngày bạn chọn là: <strong>{date || "Chưa chọn ngày"}</strong>
+                                </p>
                             </div>
                         </div>
 
@@ -127,17 +142,26 @@ const AppointmentDetail = ({ isOpen, onClose, appointment, onStatusUpdated }) =>
                             <FaClock className="mt-1" />
                             <div>
                                 <p className="font-semibold">Thời gian</p>
-                                <p>{appointment.time}</p>
+                                <p className="mb-2">{time || "Chưa chọn"}</p>
+
+                                <select
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    className="border p-2 rounded"
+                                >
+                                    <option value="">-- Chọn khung giờ --</option>
+                                    <option value="9:30-10:30">9:30-10:30</option>
+                                    <option value="10:30-11:30">10:30-11:30</option>
+                                    <option value="11:30-12:30">11:30-12:30</option>
+                                    <option value="13:30-14:30">13:30-14:30</option>
+                                    <option value="14:30-15:30">14:30-15:30</option>
+                                    <option value="15:30-16:30">15:30-16:30</option>
+                                    <option value="16:30-17:30">16:30-17:30</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-3">
-                            <FaMapMarkerAlt className="mt-1" />
-                            <div>
-                                <p className="font-semibold">Địa điểm</p>
-                                <p>{appointment.location || 'Main Hospital, Room 305'}</p>
-                            </div>
-                        </div>
+
 
                         {/* <div className="flex items-start gap-3">
                             <FaHeartbeat className="mt-1" />

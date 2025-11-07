@@ -5,10 +5,10 @@ const emrImageSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    url: {
+    urls: [{
         type: String,
         require: true,
-    }
+    }]
 })
 
 module.exports = mongoose.model('emrImage', emrImageSchema)

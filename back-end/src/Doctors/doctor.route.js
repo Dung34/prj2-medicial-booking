@@ -13,7 +13,8 @@ const { registerDoctor,
     getEduAndCert,
     updateEduAndCert,
     getDoctorByUserId,
-    getDoctorNotVerified
+    getDoctorNotVerified,
+    editImageProfile,
 } = require('./doctor.controller')
 const verifyToken = require('../Auth/verifyToken')
 const uploadToCloud = require('../Midlleware/multer')
@@ -34,7 +35,7 @@ router.delete('/:id', deleteDoctorById)
 router.post('/timeOff', registerTimeOff)
 
 router.post('/upload', uploadToCloud.single('file'), uploadImage)
-
+router.post('/profileEdit', uploadToCloud.single('file'), editImageProfile)
 router.post('/eduAndCert', registerEduAndCert)
 
 router.get('/eduAndCert', getEduAndCert)

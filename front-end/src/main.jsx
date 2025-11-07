@@ -64,7 +64,7 @@ const router = createBrowserRouter([
   {
     path: '/dashboard/edit',
     element: (
-      <ProtectedRoute allowedRoles={['admin']}>
+      <ProtectedRoute allowedRoles={['admin', 'doctor']}>
         <DoctorEdit />
       </ProtectedRoute>
     )
