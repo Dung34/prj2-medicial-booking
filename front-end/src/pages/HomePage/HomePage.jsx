@@ -11,12 +11,14 @@ const HomePage = () => {
     return (
         <div>
             <Navbar />
+            <Services />
+            {/* <MedicalSection /> */}
             {/* <MedicalSection />
             <AppointmentForm />
             <Services />
             <Reviews />
             <Recommend /> */}
-            <SelectSpeciality />
+            {/* <SelectSpeciality /> */}
         </div>
     )
 }
