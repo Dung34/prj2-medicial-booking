@@ -1,40 +1,113 @@
 import React from 'react';
+import {
+    FaRobot,
+    FaBuilding,
+    FaClipboardList,
+    FaPhone,
+    FaHome,
+    FaSyringe,
+    FaPills,
+    FaCreditCard
+} from "react-icons/fa";
 
+const services = [
+    {
+        name: "Trợ lý AI",
+        icon: FaRobot,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Khám chuyên khoa",
+        icon: FaBuilding,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Đặt lịch xét nghiệm",
+        icon: FaClipboardList,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Tư vấn trực tuyến",
+        icon: FaPhone,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Y tế tại nhà",
+        icon: FaHome,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Đặt lịch tiêm chủng",
+        icon: FaSyringe,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Mua thuốc",
+        icon: FaPills,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    },
+    {
+        name: "Thanh toán trực tuyến",
+        icon: FaCreditCard,
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600'
+    }
+]
+
+const ServiceCard = ({ icon: Icon, title, iconBg, iconColor }) => {
+    return (
+        <a
+            href="#"
+            className="flex items-center bg-white px-5 py-2 lg:p-5 md:p-5 rounded-xl shadow-md 
+                       transition duration-300 ease-in-out 
+                       hover:shadow-lg hover:-translate-y-1"
+        >
+            {/* Vòng tròn chứa icon */}
+            <div className={`flex-shrink-0 p-2 md:p-4 rounded-full ${iconBg}`}>
+                <Icon className={`size-4 md:size-6 ${iconColor}`} />
+            </div>
+
+            {/* Tên dịch vụ */}
+            <h3 className="text-sm lg:text-lg font-semibold text-gray-800 ml-5">
+                {title}
+            </h3>
+        </a>
+    );
+};
 const Services = () => {
     return (
-        <div className="text-center py-16 px-4">
-            <div className="mb-8">
-                <h1 className="text-4xl font-semibold mb-2">Services</h1>
-                <h2 className="text-2xl text-gray-500 mb-4">Services That We Provide</h2>
-                <p className="text-gray-700 max-w-2xl mx-auto">
-                    Comprehensive physical examination, also simply known as a "physical", is a process in which the physician.
-                </p>
-            </div>
-            <div className="flex flex-wrap justify-center mb-8">
-                <div className="flex flex-col items-center m-4 w-48">
-                    <img src="/path/to/birth-control-icon.png" alt="Birth Control" className="w-20 h-20 mb-2" />
-                    <h3 className="text-lg font-medium">Birth Control</h3>
+        <div className="bg-gray-50 py-8 px-4">
+            <div className="container mx-auto max-w-5xl">
+
+                {/* Tiêu đề */}
+                <h2 className="text-lg lg:text-2xl font-semibold text-gray-800 mb-4">
+                    Dịch vụ toàn diện
+                </h2>
+
+                {/* Lưới các dịch vụ */}
+                {/* - 1 cột trên mobile (mặc định)
+                  - 2 cột trên tablet/desktop (từ breakpoint 'md' trở lên)
+                */}
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
+                    {/* Lặp qua mảng services và render mỗi cái là 1 ServiceCard */}
+                    {services.map((service, index) => (
+                        <ServiceCard
+                            key={index}
+                            icon={service.icon}
+                            title={service.name}
+                            iconBg={service.iconBg}
+                            iconColor={service.iconColor}
+                        />
+                    ))}
                 </div>
-                <div className="flex flex-col items-center m-4 w-48">
-                    <img src="/path/to/cold-cough-icon.png" alt="Cold, Cough and Flu" className="w-20 h-20 mb-2" />
-                    <h3 className="text-lg font-medium">Cold, Cough and Flu</h3>
-                </div>
-                <div className="flex flex-col items-center m-4 w-48">
-                    <img src="/path/to/primary-care-icon.png" alt="Primary Care" className="w-20 h-20 mb-2" />
-                    <h3 className="text-lg font-medium">Primary Care</h3>
-                </div>
-                <div className="flex flex-col items-center m-4 w-48">
-                    <img src="/path/to/high-blood-pressure-icon.png" alt="High Blood Pressure" className="w-20 h-20 mb-2" />
-                    <h3 className="text-lg font-medium">High Blood Pressure</h3>
-                </div>
-            </div>
-            <div className="flex flex-wrap justify-center">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-2">
-                    Book an Appointment
-                </button>
-                <a href="/services" className="text-blue-500 hover:text-blue-700 m-2">
-                    More our services
-                </a>
+
             </div>
         </div>
     );
