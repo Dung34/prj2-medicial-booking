@@ -18,7 +18,7 @@ const HomePage = () => {
             <Services />
             <Reviews />
             <Recommend /> */}
-            {/* <SelectSpeciality /> */}
+            <SelectSpeciality />
         </div>
     )
 }

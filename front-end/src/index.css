@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+@layer utilities {
+
+    /* Ẩn thanh cuộn cho Chrome, Safari và Opera */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ẩn thanh cuộn cho IE, Edge và Firefox */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+}
